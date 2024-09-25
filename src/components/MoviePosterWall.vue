@@ -16,40 +16,76 @@
 
     <!-- 大型顶部横幅 -->
     <div class="featured-banner" v-if="lastWatched">
-      <img :src="lastWatched.imageUrl" :alt="lastWatched.animeTitle">
-      <div class="banner-overlay"></div>
+      <div class="banner-background" :style="{ backgroundImage: `url(${lastWatched.imageUrl})` }"></div>
       <div class="banner-content">
-        <h2>{{ lastWatched.animeTitle }}</h2>
-        <button class="play-btn">▶ Play S2 E1</button>
-        <button class="info-btn">ℹ More Info</button>
-      </div>
-    </div>
-
-    <!-- 海报墙 -->
-    <div class="anime-section">
-      <h3>Continue Watching</h3>
-      <div class="anime-grid">
-        <div v-for="anime in animeList" :key="anime.animeTitle" class="anime-item">
-          <div class="image-container">
-            <img :src="anime.imageUrl" :alt="anime.animeTitle">
+        <div class="poster-section">
+          <h3 class="last-watched-title">上次看到</h3>
+          <div class="poster">
+            <img :src="lastWatched.posterUrl" :alt="lastWatched.animeTitle">
           </div>
-          <div class="anime-info">
-            <h4>{{ anime.animeTitle }}</h4>
+        </div>
+        <div class="info">
+          <h2>{{ lastWatched.animeTitle }}</h2>
+          <div class="buttons">
+            <button class="play-btn">▶ Play S2 E1</button>
+            <button class="info-btn">ℹ More Info</button>
           </div>
         </div>
       </div>
     </div>
-    
+
+
+    <!-- 海报墙 -->
+    <div class="anime-section">
+      <div class="controls">
+        <h3>Continue Watching</h3>
+        <label class="switch">
+          <input type="checkbox" v-model="showTitles">
+          <span class="slider round"></span>
+        </label>
+        <span>{{ showTitles ? 'Title + Poster' : 'Poster Only' }}</span>
+      </div>
+      <!-- <div class="anime-grid"> -->
+        <template v-if="showTitles">
+          <div v-for="(animeList, year) in groupedAnimeList" :key="year">
+            <h3>{{ year }}</h3>
+              <div class="year-group">
+                <div class="anime-grid">
+                  <div v-for="anime in animeList" :key="anime.title" class="anime-item" @click="navigateToSeasonInfo(anime.id)">
+                    <div class="image-container">
+                      <img :src="anime.image_url" :alt="anime.title">
+                    </div>
+                    <div class="anime-info">
+                      <h4>{{ anime.title }}</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </template>
+            <template v-else>
+            <div class="anime-grid">
+              <div v-for="anime in this.animeList" :key="anime.title" class="anime-item" @click="navigateToSeasonInfo(anime.id)">
+                <div class="image-container">
+                  <img :src="anime.image_url" :alt="anime.title">
+                </div>
+              </div>
+          </div>
+        </template>
+      <!-- </div> -->
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import router from "@/router";
 
 export default {
   name: 'AnimeHomePage',
   data() {
     return {
+      showTitles: false,
       animeList: [],
       lastWatched: null
     }
@@ -57,10 +93,40 @@ export default {
   mounted() {
     this.fetchAnime()
     this.fetchLastWatched()
+
+  },
+  computed: {
+    groupedAnimeList() {
+      console.log("",this.animeList)
+      const grouped = this.animeList.reduce((acc, anime) => {
+        const year = anime.air_date.slice(0,4) || 'Unknown Year';
+        if (!acc[year]) {
+          acc[year] = [];
+        }
+        acc[year].push(anime);
+        return acc;
+      }, {});
+
+      // Sort animes within each year
+      Object.keys(grouped).forEach(year => {
+        grouped[year].sort((a, b) => {
+          const titleA = String(a.title || '');
+          const titleB = String(b.title || '');
+          return titleA.localeCompare(titleB, 'zh-CN');
+        });
+      });
+
+      console.log(grouped)
+
+      // Sort years in descending order
+      return Object.fromEntries(
+          Object.entries(grouped).sort((a, b) => b[0].localeCompare(a[0]))
+        );
+    }
   },
   methods: {
     fetchAnime() {
-      axios.get('http://127.0.0.1:8080/api/anime')
+      axios.get('http://10.0.0.232:1234/api/bangumi/list')
         .then(response => {
           this.animeList = response.data
         })
@@ -73,8 +139,12 @@ export default {
       // 暂时使用模拟数据
       this.lastWatched = {
         animeTitle: "負けヒロインが多すぎる",
-        imageUrl: "https://ice.frostsky.com/2024/09/15/b70b6cbd71db737186350d4391b65ea9.png"
+        imageUrl: "https://api.bgm.tv/v0/subjects/464376/image?type=large",
+        posterUrl: "https://api.bgm.tv/v0/subjects/464376/image?type=large"
       }
+    },
+    navigateToSeasonInfo(animeId) {
+      router.push(`/season/${animeId}`);
     }
   }
 }
@@ -129,6 +199,13 @@ body {
   overflow: hidden;
 }
 
+.featured-banner {
+  position: relative;
+  width: 100%;
+  height: 500px; /* 减小高度 */
+  overflow: hidden;
+}
+
 .featured-banner img {
   width: 100%;
   height: 100%;
@@ -146,8 +223,8 @@ body {
 
 .banner-content {
   position: absolute;
-  bottom: 10%;
-  left: 5%;
+  bottom: 1%;
+  left: 3%;
   z-index: 2;
   max-width: 50%;
 }
@@ -162,6 +239,90 @@ body {
   font-size: 1.2rem;
   margin-bottom: 1rem;
   color: #00ff00; /* 绿色，类似Prime Video的风格 */
+}
+
+.banner-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(5px); /* 添加毛玻璃效果 */
+  transform: scale(1.1); /* 防止模糊边缘 */
+}
+
+.banner-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 20px;
+  color: white;
+  z-index: 1;
+}
+
+.poster-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-right: 20px;
+}
+
+.last-watched-title {
+  margin-bottom: 10px;
+  font-size: 28px; /* 增加字体大小 */
+  font-weight: bold;
+}
+
+.poster {
+  flex-shrink: 0;
+  width: 180px;
+  height: 260px;
+  margin-right: 20px;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.info {
+  flex-grow: 1;
+}
+
+h2 {
+  margin-bottom: 15px;
+  font-size: 24px;
+}
+
+.buttons {
+  display: flex;
+  gap: 15px;
+  padding-top:75px; 
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.play-btn {
+  background-color: #e50914;
+  color: white;
+}
+
+.info-btn {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
 }
 
 .play-btn, .info-btn {
@@ -193,6 +354,18 @@ body {
   gap: 20px;
   padding: 10px 0;
 }
+
+.year-group {
+  margin-bottom: 30px;
+}
+
+.year-group h2 {
+  
+  margin-bottom: 15px;
+  font-size: 1.5em;
+  color: #333;
+}
+
 
 .anime-item {
   transition: transform 0.3s ease;
@@ -228,6 +401,65 @@ body {
   font-size: 14px;
   text-align: center;
 }
+
+.controls {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+  margin: 0 10px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
 
 /* 响应式设计 */
 @media (max-width: 768px) {

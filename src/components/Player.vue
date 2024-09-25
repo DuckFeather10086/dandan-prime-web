@@ -15,11 +15,12 @@ export default defineComponent({
   props: {
     src: {
       type: String,
+      default : "http://10.0.0.232:1234/videos/[ANi] 不時輕聲地以俄語遮羞的鄰座艾莉同學 - 12 [1080P][Baha][WEB-DL][AAC AVC][CHT].mp4",
       required: true
     },
     subtitleSrc: {
       type: String,
-      default: '/subtitles/yurucamp_06.ass'
+      //default: '/subtitles/yurucamp_06.ass'
     }
   },
   setup(props) {
@@ -61,6 +62,7 @@ export default defineComponent({
         items: danmakuItems,
       });
 
+      console.log(props.src)
       player = new Player({
         src: props.src,
         plugins: [danmaku],

@@ -1,45 +1,43 @@
 <template>
   <div class="season-detail-page">
     <div class="hero-banner">
-      <img :src="season.bannerImage" :alt="season.title" class="banner-image">
+      <img :src="seasonData.image_url" :alt="seasonData.title" class="banner-image">
       <div class="banner-overlay"></div>
       <div class="banner-content">
-        <h1>{{ season.title }}</h1>
+        <h1>{{ seasonData.title }}</h1>
         <div class="season-select">
           <select v-model="selectedSeason" class="custom-select">
-            <option v-for="n in season.totalSeasons" :key="n" :value="n">
+            <!-- <option v-for="n in season.totalSeasons" :key="n" :value="n">
               Season {{ n }}
-            </option>
+            </option> -->
           </select>
         </div>
-        <p class="description">{{ season.description }}</p>
+        <p class="description">{{ seasonData.summary }}</p>
         <div class="meta-info">
-          <span class="rating">★ {{ season.rating }}</span>
-          <span class="imdb">IMDb {{ season.imdbRating }}</span>
-          <span class="year">{{ season.year }}</span>
-          <span class="episodes">{{ season.episodes_length }} episodes</span>
-          <span class="age-rating">{{ season.ageRating }}</span>
+          <span class="rating">★ {{ seasonData.rate_score }}</span>
+          <span class="year">{{ seasonData.air_date }}</span>
+          <span class="episodes">{{ seasonData.total_episodes }} episodes</span>
         </div>
-        <div class="genres">
+        <!-- <div class="genres">
           <span v-for="genre in season.genres" :key="genre">{{ genre }}</span>
-        </div>
-        <div class="actions">
+        </div> -->
+        <!-- <div class="actions">
           <button class="play-btn">▶ Episode {{ season.nextEpisode }}</button>
-        </div>
+        </div> -->
       </div>
     </div>
   
       <!-- 剧集列表 -->
       <div class="episode-list">
         <h2>Episodes</h2>
-        <div v-for="episode in season.episodes" :key="episode.number" class="episode-item">
+        <div v-for="episode in seasonData.episodes" :key="episode.number" class="episode-item">
           <img :src="episode.thumbnail" :alt="episode.title" class="episode-thumbnail">
           <div class="episode-info">
-            <h3>{{ `S${season.seasonNumber} E${episode.number} - ${episode.title}` }}</h3>
+            <h3>{{ `${episode.title}` }}</h3>
             <p class="episode-meta">
-              {{ episode.airDate }} | {{ episode.duration }}
+              <!-- {{ episode.airDate }} | {{ episode.duration }} -->
             </p>
-            <p class="episode-description">{{ episode.description }}</p>
+            <p class="episode-description">{{ episode.introduction }}</p>
           </div>
           <div class="episode-actions">
             <button class="download-btn">⬇</button>
@@ -50,46 +48,30 @@
   </template>
   
   <script>
+  import axios from 'axios'
+
   export default {
     name: 'SeasonDetailPage',
     data() {
       return {
-        selectedSeason: 1,
-        season: {
-          title: "ゆるキャン△",
-          seasonNumber: 1,
-          totalSeasons: 2,
-          bannerImage: "https://ice.frostsky.com/2024/09/15/cd0a378df3fe3444e776e642f7d81cca.jpeg",
-          description: "これは、ある冬の日の物語。静岡から山梨に引っ越してきた女子高校生・なでしこは、\"千円札の絵にもなっている富士山\"を見るために自転車を走らせて本栖湖まで行ったものの、あいにく天気はくもり空。富士山も望めず、疲れ果ててなでしこはその場で眠りこけてしまう。目覚めてみるとそこは夜。初めての場所で。寒さに震えるなでしこを救ったのは、1人キャンプ好きの女の子・リンだった。冷えた身体を温めるために焚き火にあたる2人。ぽっぽっと薪の爆ぜる音が、湖畔の静寂に沁み込んでいく。焚き...",
-          rating: 4.5,
-          imdbRating: 8.1,
-          year: 2018,
-          ageRating: "13+",
-          genres: ["Anime", "International", "Animation", "Adventure"],
-          nextEpisode: 2,
-          episodes_length:13,
-          episodes: [
-            {
-              number: 1,
-              title: "ふじさんとカレーめん",
-              thumbnail: "https://path-to-episode-thumbnail.jpg",
-              airDate: "January 4, 2018",
-              duration: "24min",
-              description: "志摩リンは「一人キャンプ=ソロキャン」が趣味の女子高生。11月の寒空にもかかわらず、自転車を走らせて今日は本栖湖でソロキャン。冬のキャンプ場はリンの貸し切り状態だけど、なぜか外のベンチでずっと眺めこけている女の子が……。その子の名前は各務原なでしこ。山梨に引っ越したばかりで、\"千円札の絵にもなっている富士山\"を見に来たらしい。ひょんな出会いをきっかけに、二人は夜の本栖湖で一緒に過ごすことになり……。【日常/ほのぼの"
-            },
-            {
-              number: 2,
-              title: "ふじさんとカレーめん",
-              thumbnail: "https://path-to-episode-thumbnail.jpg",
-              airDate: "January 4, 2018",
-              duration: "24min",
-              description: "志摩リンは「一人キャンプ=ソロキャン」が趣味の女子高生。11月の寒空にもかかわらず、自転車を走らせて今日は本栖湖でソロキャン。冬のキャンプ場はリンの貸し切り状態だけど、なぜか外のベンチでずっと眺めこけている女の子が……。その子の名前は各務原なでしこ。山梨に引っ越したばかりで、\"千円札の絵にもなっている富士山\"を見に来たらしい。ひょんな出会いをきっかけに、二人は夜の本栖湖で一緒に過ごすことになり……。【日常/ほのぼの"
-            },
-            // ... more episodes ...
-          ]
-        }
+        seasonData: null
       }
     },
+    created() {                       
+      this.fetchSeasonInfo()
+    },
+    methods: {
+      async fetchSeasonInfo() {
+        const animeId = this.$route.params.animeId
+        console.log('Fetching season info for anime ID:', animeId)
+        try {
+          const response = await axios.get(`http://10.0.0.232:1234/api/bangumi/${animeId}/contents`)
+          this.seasonData = response.data
+        } catch (error) {
+          console.error('Error fetching season info:', error)
+        }
+      }
+    }
     // Add any necessary methods here
   }
   </script>
@@ -110,6 +92,7 @@
   .banner-image {
     width: 100%;
     height: 100%;
+    filter: blur(0px); /* 添加毛玻璃效果 */
     object-fit: cover;
   }
   
