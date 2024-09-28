@@ -38,9 +38,10 @@
               <!-- {{ episode.airDate }} | {{ episode.duration }} -->
             </p>
             <p class="episode-description">{{ episode.introduction }}</p>
+            <p>{{`${seasonData.directory }`}}/{{ episode.file_name }}</p>
           </div>
-          <div class="episode-actions">
-            <button class="download-btn">⬇</button>
+          <div class="episode-actions"  @click="navigateToEpisodeInfo(episode.id)">
+            <button class="download-btn" >▶</button>
           </div>
         </div>
       </div>
@@ -49,6 +50,7 @@
   
   <script>
   import axios from 'axios'
+  import router from "@/router";
 
   export default {
     name: 'SeasonDetailPage',
@@ -70,6 +72,9 @@
         } catch (error) {
           console.error('Error fetching season info:', error)
         }
+      },
+      navigateToEpisodeInfo(episodeID) {
+        router.push(`/play/${episodeID}`);
       }
     }
     // Add any necessary methods here
