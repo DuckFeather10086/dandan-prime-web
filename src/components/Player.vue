@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, onBeforeUnmount, ref } from 'vue';
+import { defineComponent, onMounted, onBeforeUnmount, ref,toRaw  } from 'vue';
 import { useRoute } from 'vue-router'
 import Player from 'nplayer';
 import Danmaku from '@nplayer/danmaku';
@@ -49,12 +49,41 @@ export default defineComponent({
     let player = null;
     let renderer = null;
 
-    const danmakuItems = [
-      { text: "口技 ", time: 0 },
-      { text: "傻袍子 ", time: 0, color: "#2196F3" },
-      { text: "233真的是摔啊 ", time: 1, color: "#2196F3" },
-      { text: "同时出土可以减少被吃的数量 ", time: 10, color: "#673AB7" }
-    ];
+    const danmakuItems = ref([]);
+
+    const fetchDanmakuItems = async (episodeId) => {
+      try {
+        const response = await fetch(`http://10.0.0.232:1234/api/bangumi/danmaku/${episodeId}`);
+        const data = await response.json();
+        danmakuItems.value = data.danmakus;
+        console.log('Fetched danmaku items:', data.danmakus);
+      } catch (error) {
+        console.error('Failed to fetch danmaku items:', error);
+      }
+    };
+
+    const fetchEpisodeInfo = async () => {
+      try {
+        const episodeId = route.params.episodeId;
+
+        // Fetch episode info
+        const response = await fetch(`http://10.0.0.232:1234/api/bangumi/episode/${episodeId}`);
+        const data = await response.json();
+        
+        videoSrc.value = `http://10.0.0.232:1234/videos/${data.file_path}/${data.file_name}`;
+        console.log('Fetching season info for subtitles:', data.subtitles);
+        console.log('Fetching season info for subtitles:', data.subtitles.length);
+        if (data.subtitles && data.subtitles.length > 0) {
+          subtitleSrc = `http://10.0.0.232:1234/subtitles/${data.file_path}/${data.subtitles[0]}`;
+          console.log('Initializing subtitles114', subtitleSrc);
+        }
+
+        // Fetch danmaku items
+        await fetchDanmakuItems(episodeId);
+      } catch (error) {
+        console.error('Failed to fetch episode info:', error);
+      }
+    };
 
     const initializeSubtitles = async (subtitleSrc) => {
       console.log('Initializing subtitles1', props.subtitleSrc);
@@ -80,31 +109,26 @@ export default defineComponent({
       }
     };
 
-    const fetchEpisodeInfo = async () => {
-      try {
-        const episodeId  = route.params.episodeId
-
-
-        const response = await fetch(`http://10.0.0.232:1234/api/bangumi/episode/${episodeId}`);
-        const data = await response.json();
-        
-        videoSrc.value = `http://10.0.0.232:1234/videos/${data.file_path}/${data.file_name}`;
-        console.log('Fetching season info for subtitles:', data.subtitles)
-        console.log('Fetching season info for subtitles:',  data.subtitles.length)
-        if (data.subtitles && data.subtitles.length > 0) {
-          subtitleSrc = `http://10.0.0.232:1234/subtitles/${data.file_path}/${data.subtitles[0]}`;
-          console.log('Initializing subtitles114', subtitleSrc)
-        }
-      } catch (error) {
-        console.error('Failed to fetch episode info:', error);
-      }
-    };
-
     onMounted(async () => {
       await fetchEpisodeInfo();
+      const danmakuArr = toRaw(danmakuItems.value);
+      console.log('Player mounted successfully1',danmakuArr);
+
+      // const danmakuItems1 = [
+      // { text: "作品以21世纪初的日本某乡镇为舞台,描绘著一名高中少年“阿良良木历”与少女们遇到许多日本民间传说的怪谭故事", time: 0 },
+      // { text: "傻袍子 ", time: 0, color: "#2196F3" },
+      // { text: "作品以21世纪初的日本某乡镇为舞台,描绘著一名高中少年“阿少女们遇到许多日本民间传说的怪谭故事。",time: 0,color: "#673AB7",},
+
+      // { text: "同时出土可以减少被吃的数量 ", time: 10, color: "#673AB7" },
+      // { text: "233真的是摔啊 ", time: 1, color: "#2196F3" },
+
+      // ];
+
+      console.log('Player mounted successfully2',danmakuItems);
+
 
       const danmaku = new Danmaku({
-        items: danmakuItems,
+        items: danmakuItems.value,
       });
       console.log(videoSrc.value)
       player = new Player({
@@ -133,7 +157,8 @@ export default defineComponent({
       playerContainer,
       subtitleContainer,
       videoSrc,
-      subtitleSrc
+      subtitleSrc,
+      danmakuItems
     };
   }
 });
