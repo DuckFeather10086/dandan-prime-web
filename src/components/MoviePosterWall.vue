@@ -1,18 +1,5 @@
 <template>
   <div class="anime-homepage">
-    <!-- 导航栏 -->
-    <nav class="navbar">
-      <div class="logo">Anime Video</div>
-      <div class="nav-links">
-        <a href="#">Home</a>
-        <a href="#">Movies</a>
-        <a href="#">TV Shows</a>
-        <a href="#">My List</a>
-      </div>
-      <div class="user-menu">
-        <span class="user-icon">👤</span>
-      </div>
-    </nav>
 
     <!-- 大型顶部横幅 -->
     <div class="featured-banner" v-if="lastWatched">
@@ -126,7 +113,8 @@ export default {
   },
   methods: {
     fetchAnime() {
-      axios.get('http://10.0.0.232:1234/api/bangumi/list')
+      const apiHost = process.env.VUE_APP_API_HOST;
+      axios.get(apiHost+'/api/bangumi/list')
         .then(response => {
           this.animeList = response.data
         })

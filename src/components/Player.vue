@@ -1,10 +1,10 @@
 <template>
   <div class="video-player-container">
-    <div class="player-wrapper">
       <div ref="playerContainer" class="player-container">
-        <div id="ass-container"></div>
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+          <div id="ass-container"  style="position: relative;"></div>
+        </div>
       </div>
-    </div>
   </div>
 </template>
 
@@ -53,7 +53,8 @@ export default defineComponent({
 
     const fetchDanmakuItems = async (episodeId) => {
       try {
-        const response = await fetch(`http://10.0.0.232:1234/api/bangumi/danmaku/${episodeId}`);
+        const apiHost = process.env.VUE_APP_API_HOST;
+        const response = await fetch(apiHost+`/api/bangumi/danmaku/${episodeId}`);
         const data = await response.json();
         danmakuItems.value = data.danmakus;
         console.log('Fetched danmaku items:', data.danmakus);
@@ -67,14 +68,15 @@ export default defineComponent({
         const episodeId = route.params.episodeId;
 
         // Fetch episode info
-        const response = await fetch(`http://10.0.0.232:1234/api/bangumi/episode/${episodeId}`);
+        const apiHost = process.env.VUE_APP_API_HOST;
+        const response = await fetch(apiHost+`/api/bangumi/episode/${episodeId}`);
         const data = await response.json();
         
-        videoSrc.value = `http://10.0.0.232:1234/videos/${data.file_path}/${data.file_name}`;
+        videoSrc.value = apiHost+`/videos${data.file_path}/${data.file_name}`;
         console.log('Fetching season info for subtitles:', data.subtitles);
         console.log('Fetching season info for subtitles:', data.subtitles.length);
         if (data.subtitles && data.subtitles.length > 0) {
-          subtitleSrc = `http://10.0.0.232:1234/subtitles/${data.file_path}/${data.subtitles[0]}`;
+          subtitleSrc = apiHost+`/subtitles${data.file_path}/${data.subtitles[0]}`;
           console.log('Initializing subtitles114', subtitleSrc);
         }
 
@@ -220,7 +222,6 @@ export default defineComponent({
 
 .subtitle-container {
   position: absolute;
-  bottom: 20px;
   left: 0;
   right: 0;
   text-align: center;

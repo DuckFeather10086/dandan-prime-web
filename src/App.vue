@@ -1,7 +1,7 @@
 <!-- src/App.vue -->
 <template>
- 
   <div id="app">
+    <Navbar></Navbar>
     <router-view :key="$route.fullPath"></router-view>
   </div>
 </template>
@@ -11,6 +11,7 @@
 // import SeasonDetail from './components/SeasonDetail.vue';
 // import MoviePosterWall from './components/MoviePosterWall.vue';
 // import Player from './components/Player.vue';
+import Navbar from './components/naviBar.vue';
 
 export default {
   name: 'App',
@@ -18,6 +19,7 @@ export default {
     // SeasonDetail,
     //MoviePosterWall
     // Player,
+    Navbar,
   },  
 }
 
@@ -29,6 +31,8 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+  min-height: 30vh;
+  background-color: #2c3e50; /* 设置你想要的背景颜色 */
 }
 
 html, body {

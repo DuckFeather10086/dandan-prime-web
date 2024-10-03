@@ -30,18 +30,15 @@
       <!-- 剧集列表 -->
       <div class="episode-list">
         <h2>Episodes</h2>
-        <div v-for="episode in seasonData.episodes" :key="episode.number" class="episode-item">
-          <img :src="episode.thumbnail" :alt="episode.title" class="episode-thumbnail">
-          <div class="episode-info">
-            <h3>{{ `${episode.title}` }}</h3>
-            <p class="episode-meta">
-              <!-- {{ episode.airDate }} | {{ episode.duration }} -->
-            </p>
-            <p class="episode-description">{{ episode.introduction }}</p>
-            <p>{{`${seasonData.directory }`}}/{{ episode.file_name }}</p>
+        <div v-for="(episodeGroup, dandanplayEpisodeId) in seasonData.episodes" :key="dandanplayEpisodeId" class="episode-group">
+          <h3>{{ episodeGroup[0].title }}</h3>
+          <div class="episode-details">
+            <img v-if="episodeGroup[0].thumbnail" :src="episodeGroup[0].thumbnail" :alt="episodeGroup[0].title" class="episode-thumbnail">
+            <p class="episode-introduction">{{ episodeGroup[0].introduction || 'No description available' }}</p>
           </div>
-          <div class="episode-actions"  @click="navigateToEpisodeInfo(episode.id)">
-            <button class="download-btn" >▶</button>
+          <div v-for="episode in episodeGroup" :key="episode.id" class="episode-item">
+            <p class="episode-filename">{{ episode.file_name }}</p>
+            <button class="play-btn" @click="navigateToEpisodeInfo(episode.id)">▶</button>
           </div>
         </div>
       </div>
@@ -67,7 +64,8 @@
         const animeId = this.$route.params.animeId
         console.log('Fetching season info for anime ID:', animeId)
         try {
-          const response = await axios.get(`http://10.0.0.232:1234/api/bangumi/${animeId}/contents`)
+          const apiHost = process.env.VUE_APP_API_HOST;
+          const response = await axios.get(apiHost+`/api/bangumi/${animeId}/contents`)
           this.seasonData = response.data
         } catch (error) {
           console.error('Error fetching season info:', error)
@@ -285,4 +283,65 @@
       margin-bottom: 1rem;
     }
   }
+
+.episode-group {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 1rem;
+}
+
+.episode-details {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.episode-thumbnail {
+  width: 200px;
+  height: auto;
+  margin-right: 1rem;
+  object-fit: cover;
+}
+
+.episode-introduction {
+  flex: 1;
+  font-size: 0.9rem;
+  color: #ddd;
+}
+
+.episode-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 0.5rem;
+  background-color: rgba(255,255,255,0.05);
+  border-radius: 5px;
+  margin-bottom: 0.3rem;
+  height: 2rem; /* Adjust this value to match your title height */
+}
+
+.episode-filename {
+  flex: 1;
+  font-size: 1rem;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 1rem;
+  line-height: 1.2rem; /* Adjust line height for vertical centering */
+}
+
+.play-btn {
+  background-color: transparent;
+  color: #00a8e1;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  transition: color 0.3s;
+  line-height: 1; /* Ensure the icon is vertically centered */
+}
+
+.play-btn:hover {
+  color: #0082b0;
+}
   </style>
