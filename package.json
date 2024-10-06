@@ -13,8 +13,8 @@
     "assjs": "^0.1.2",
     "axios": "^1.7.7",
     "core-js": "^3.8.3",
+    "depcheck": "^1.4.7",
     "jassub": "^1.7.17",
-    "libass-wasm": "^4.1.0",
     "nplayer": "^1.0.15",
     "vue-router": "^4.4.5"
   },

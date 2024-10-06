@@ -115,17 +115,6 @@ export default defineComponent({
       await fetchEpisodeInfo();
       const danmakuArr = toRaw(danmakuItems.value);
       console.log('Player mounted successfully1',danmakuArr);
-
-      // const danmakuItems1 = [
-      // { text: "作品以21世纪初的日本某乡镇为舞台,描绘著一名高中少年“阿良良木历”与少女们遇到许多日本民间传说的怪谭故事", time: 0 },
-      // { text: "傻袍子 ", time: 0, color: "#2196F3" },
-      // { text: "作品以21世纪初的日本某乡镇为舞台,描绘著一名高中少年“阿少女们遇到许多日本民间传说的怪谭故事。",time: 0,color: "#673AB7",},
-
-      // { text: "同时出土可以减少被吃的数量 ", time: 10, color: "#673AB7" },
-      // { text: "233真的是摔啊 ", time: 1, color: "#2196F3" },
-
-      // ];
-
       console.log('Player mounted successfully2',danmakuItems);
 
 
@@ -154,7 +143,7 @@ export default defineComponent({
         renderer.destroy();
       }
     });
-
+   
     return {
       playerContainer,
       subtitleContainer,
