@@ -10,6 +10,7 @@
 
 <script>
 import { defineComponent, onMounted, onBeforeUnmount, ref,toRaw  } from 'vue';
+import Hls from 'hls.js'
 import { useRoute } from 'vue-router'
 import Player from 'nplayer';
 import Danmaku from '@nplayer/danmaku';
@@ -47,6 +48,7 @@ export default defineComponent({
     //const episodeId = ref(0)
     var subtitleSrc = "";
     let player = null;
+    let hls = null;
     let renderer = null;
 
     const danmakuItems = ref([]);
@@ -111,6 +113,33 @@ export default defineComponent({
       }
     };
 
+    const initializeHls = async (hls) => {
+      hls.attachMedia(player.video)
+      hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+        hls.loadSource('http://10.0.0.232:1234/stream/output.m3u8')
+      })
+
+      hls.on(Hls.Events.ERROR, function (event, data) {
+        if (data.fatal) {
+          switch (data.type) {
+            case Hls.ErrorTypes.NETWORK_ERROR:
+              // 处理网络错误，包括404 Not Found
+              console.error('网络错误:', data.details);
+              if (data.response && data.response.code === 404) {
+                console.log('404_ERROR');
+              }
+              break;
+            case Hls.ErrorTypes.MEDIA_ERROR:
+              console.error('媒体错误:', data.details);
+              break;
+            default:
+              console.error('未知错误:', data.details);
+              break;
+          }
+        }
+      });
+    }
+
     onMounted(async () => {
       await fetchEpisodeInfo();
       const danmakuArr = toRaw(danmakuItems.value);
@@ -129,8 +158,11 @@ export default defineComponent({
 
       player.mount(playerContainer.value);
 
+      hls = new Hls()
+
       // Initialize subtitles after player is mounted
       await initializeSubtitles(subtitleSrc);
+      await initializeHls(hls);
 
       document.addEventListener("fullscreenerror", (event) => {
         console.error("全屏错误可能是由于iframe没有全屏权限导致的");
