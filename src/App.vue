@@ -26,7 +26,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   min-height: 30vh;
-  background-color: #2c3e50; /* 设置你想要的背景颜色 */
+  background-color: #2c3e50; 
 }
 
 html, body {

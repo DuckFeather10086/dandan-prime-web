@@ -8,19 +8,18 @@
         <div class="poster-section">
           <h3 class="last-watched-title">上次看到</h3>
           <div class="poster">
-            <img :src="lastWatched.posterUrl" :alt="lastWatched.animeTitle">
+            <img :src="lastWatched.posterUrl" :alt="lastWatched.anime_title">
           </div>
         </div>
         <div class="info">
-          <h2>{{ lastWatched.animeTitle }}</h2>
+          <h2>{{ lastWatched.anime_title }}</h2>
           <div class="buttons">
-            <button class="play-btn">▶ Play S2 E1</button>
-            <button class="info-btn">ℹ More Info</button>
+            <button class="play-btn"  @click="navigateToEpisodeInfo(lastWatched.episode_id)">▶ Play</button>
+            <button class="info-btn"  @click="navigateToSeasonInfo(lastWatched.anime_id)">More Info</button>
           </div>
         </div>
       </div>
     </div>
-
 
     <!-- 海报墙 -->
     <div class="anime-section">
@@ -30,8 +29,13 @@
           <span class="slider round"></span>
         </label>
         <span>{{'按照年份排序'}}</span>
+        <input 
+          type="text" 
+          v-model="searchQuery" 
+          placeholder="搜索动画标题" 
+          class="search-input"
+        >
       </div>
-      <!-- <div class="anime-grid"> -->
         <template v-if="showTitles">
           <div v-for="(animeList, year) in groupedAnimeList" :key="year">
             <h3>{{ year }}</h3>
@@ -50,15 +54,17 @@
           </div>
         </template>
             <template v-else>
+            <div v-if="filteredAnimeList.length === 0">
+              <p>没有找到匹配的动画</p>
+            </div>
             <div class="anime-grid">
-              <div v-for="anime in this.animeList" :key="anime.title" class="anime-item" @click="navigateToSeasonInfo(anime.id)">
+              <div v-for="anime in filteredAnimeList" :key="anime.title" class="anime-item" @click="navigateToSeasonInfo(anime.id)">
                 <div class="image-container">
                   <img :src="anime.image_url" :alt="anime.title">
                 </div>
               </div>
           </div>
         </template>
-      <!-- </div> -->
     </div>
   </div>
 </template>
@@ -73,7 +79,8 @@ export default {
     return {
       showTitles: false,
       animeList: [],
-      lastWatched: null
+      lastWatched: null,
+      searchQuery: '' 
     }
   },
   mounted() {
@@ -82,9 +89,20 @@ export default {
 
   },
   computed: {
+    filteredAnimeList() {
+      if (!this.searchQuery) {
+        return this.animeList;
+      }
+      console.log(this.animeList.filter(anime => 
+        anime.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+      ))
+      return this.animeList.filter(anime => 
+        anime.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    },
     groupedAnimeList() {
-      console.log("",this.animeList)
-      const grouped = this.animeList.reduce((acc, anime) => {
+      // 使用 filteredAnimeList 替代 this.animeList
+      const grouped = this.filteredAnimeList.reduce((acc, anime) => {
         const year = anime.air_date.slice(0,4) || 'Unknown Year';
         if (!acc[year]) {
           acc[year] = [];
@@ -122,16 +140,26 @@ export default {
         })
     },
     fetchLastWatched() {
-      // 这里应该是一个单独的API调用来获取最后观看的内容
-      // 暂时使用模拟数据
+      const apiHost = process.env.VUE_APP_API_HOST;
+      axios.get(apiHost+'/api/bangumi/last_watched')
+        .then(response => {
+          this.lastWatched = response.data
+        })
+        .catch(error => {
+          console.error('Error fetching anime:', error)
+        })
+
       this.lastWatched = {
-        animeTitle: "負けヒロインが多すぎる",
+        anime_title: "負けヒロインが多すぎる",
         imageUrl: "https://api.bgm.tv/v0/subjects/464376/image?type=large",
         posterUrl: "https://api.bgm.tv/v0/subjects/464376/image?type=large"
       }
     },
     navigateToSeasonInfo(animeId) {
       router.push(`/season/${animeId}`);
+    },
+    navigateToEpisodeInfo(episodeID) {
+        router.push(`/play/${episodeID}`);
     }
   }
 }
@@ -371,6 +399,7 @@ button {
   display: flex;
   align-items: center;
   margin-bottom: 15px;
+  flex-wrap: wrap; /* 允许在小屏幕上换行 */
 }
 
 .switch {
@@ -465,6 +494,28 @@ input:checked + .slider:before {
   
   .banner-content {
     max-width: 80%;
+  }
+}
+
+.search-input {
+  margin-left: 15px;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* 响应式样式 */
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .search-input {
+    margin-left: 0;
+    margin-top: 10px;
+    width: 100%;
   }
 }
 </style>

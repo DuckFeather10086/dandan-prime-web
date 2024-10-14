@@ -27,7 +27,6 @@ export default defineComponent({
   },
   props: {
     paramEpisodeId: {
-
       required: true
     },
   },
@@ -40,7 +39,6 @@ export default defineComponent({
       console.log('Fetching season info for episode ID:', this.episodeId)
     },
     async fetchEpisodeInfo(){
-
     }
   },
   setup(props) {
@@ -48,12 +46,10 @@ export default defineComponent({
     const subtitleContainer = ref(null);
     const videoSrc = ref('');
     const route  = useRoute()
-    //const episodeId = ref(0)
     var subtitleSrc = "";
     let player = null;
     let hls = null;
     let renderer = null;
-   // const requestedFragments = new Map(); // Add this line to create a global map
 
     const danmakuItems = ref([]);
 
@@ -63,7 +59,7 @@ export default defineComponent({
         const response = await fetch(apiHost+`/api/bangumi/danmaku/${episodeId}`);
         const data = await response.json();
         danmakuItems.value = data.danmakus;
-        console.log('Fetched danmaku items:', data.danmakus);
+        console.log('Fetched danmaku items len:', data.danmakus.length);
       } catch (error) {
         console.error('Failed to fetch danmaku items:', error);
       }
@@ -79,11 +75,8 @@ export default defineComponent({
         const data = await response.json();
         
         videoSrc.value = apiHost+`/videos${data.file_path}/${data.file_name}`;
-        console.log('Fetching season info for subtitles:', data.subtitles);
-        console.log('Fetching season info for subtitles:', data.subtitles.length);
         if (data.subtitles && data.subtitles.length > 0) {
           subtitleSrc = apiHost+`/subtitles${data.file_path}/${data.subtitles[0]}`;
-          console.log('Initializing subtitles114', subtitleSrc);
         }
 
         // Fetch danmaku items
@@ -119,14 +112,13 @@ export default defineComponent({
 
     const initializeHls = async (hls) => {
       hls.attachMedia(player.video)
-
       hls.on(Hls.Events.MEDIA_ATTACHED, async function () {
         try {
           const apiHost = process.env.VUE_APP_API_HOST;
           const episodeID = route.params.episodeId
           const response = await axios.post(apiHost+'/api/playlist/'+episodeID);
           console.log('Playlist API response:', response.data);
-          hls.loadSource('http://10.0.0.232:1234/stream/playlist.m3u8');
+          hls.loadSource(apiHost+'/stream/playlist.m3u8');
         } catch (error) {
           console.error('Error calling playlist API:', error);
         }
@@ -141,7 +133,6 @@ export default defineComponent({
 
       hls.on(Hls.Events.FRAG_LOADING, function (event, data) {
         console.log('Loading fragment:', data.frag.url);
-        // 记录开始加载的时间
         data.frag.startLoadTime = performance.now();
       });
 
@@ -151,24 +142,14 @@ export default defineComponent({
         console.log('Loading time:', loadTime, 'ms');
         console.log('Fragment loaded:', data.frag.sn);
         this.currentSegmentIndex = data.frag.sn;
-        //notifyServerForNextFragments(this.currentSegmentIndex)
       });
-
 
       hls.on(Hls.Events.ERROR, function (event, data) {
         if (data.fatal) {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
               if (data.response && data.response.code === 404) {
-                //hls.startLoad()
-                // //const currentTime = video.currentTime;
-                // const nextFragmentStart = hls.streamController.nextLoadPosition;
-                // //console.log('404_ERROR', "next fragment start: " + nextFragmentStart);
                 hls.startLoad()
-
-                //hls.stopLoad();
-                // console.log("'404_ERROR'",data.frag.relurl)
-                //notifyServerForNextFragments(hls, data.frag.relurl ,nextFragmentStart)
               }
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
@@ -194,7 +175,6 @@ export default defineComponent({
       console.log('Player mounted successfully1',danmakuArr);
       console.log('Player mounted successfully2',danmakuItems);
 
-
       const danmaku = new Danmaku({
         items: danmakuItems.value,
       });
@@ -207,12 +187,12 @@ export default defineComponent({
       player.mount(playerContainer.value);
 
       var config = {
-        maxBufferLength: 30,          // 设置最大缓冲长度为30秒
-        maxMaxBufferLength: 60,       // 设置绝对最大缓冲长度为60秒
-        maxBufferSize: 60 * 1000000,  // 设置最大缓冲大小为60MB
-        maxBufferHole: 0.5,           // 设置最大缓冲空洞为0.5秒
-        highBufferWatchdogPeriod: 2,  // 设置高缓冲监控周期为2秒
-        nudgeMaxRetry: 5,             // 设置最大尝试次数为5
+        maxBufferLength: 30,
+        maxMaxBufferLength: 60,
+        maxBufferSize: 60 * 1000000,
+        maxBufferHole: 0.5,
+        highBufferWatchdogPeriod: 2,
+        nudgeMaxRetry: 5,
       };
       hls = new Hls(config)
 
@@ -247,7 +227,6 @@ export default defineComponent({
 });
 </script>
 
-
 <style scoped>
 .video-player-container {
   width: 100%;
@@ -259,39 +238,6 @@ export default defineComponent({
   color: white;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  background-color: #2d2d2d;
-}
-
-.header nav a {
-  color: white;
-  text-decoration: none;
-  margin: 0 10px;
-}
-
-.header nav a.active {
-  color: #ff69b4;
-}
-
-.right-controls {
-  display: flex;
-  align-items: center;
-}
-
-.right-controls > * {
-  margin-left: 10px;
-}
-
-.player-wrapper {
-  position: relative;
-  width: 100%;
-  padding-top: 56.25%; /* 16:9 Aspect Ratio */
-}
-
 .player-container {
   position: absolute;
   top: 0;
@@ -299,52 +245,5 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   background-color: #000;
-}
-
-.subtitle-container {
-  position: absolute;
-  left: 0;
-  right: 0;
-  text-align: center;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 9999; /* 确保字幕在最上层 */
-}
-
-/* 添加全屏时的样式 */
-:fullscreen .subtitle-container {
-  bottom: 40px; /* 在全屏模式下稍微增加底部距离 */
-}
-
-/* 兼容不同浏览器的全屏选择器 */
-:-webkit-full-screen .subtitle-container {
-  bottom: 40px;
-}
-
-:-moz-full-screen .subtitle-container {
-  bottom: 40px;
-}
-
-:-ms-fullscreen .subtitle-container {
-  bottom: 40px;
-}
-
-.player-controls {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  background-color: #2d2d2d;
-}
-
-.progress-bar {
-  flex-grow: 1;
-  margin: 0 10px;
-}
-
-.bottom-info {
-  padding: 10px;
-  text-align: center;
-  font-size: 0.9em;
-  color: #888;
 }
 </style>
