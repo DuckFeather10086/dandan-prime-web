@@ -9,17 +9,20 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, onBeforeUnmount, ref,toRaw  } from 'vue';
+import { defineComponent, onMounted, onBeforeUnmount, ref, toRaw} from 'vue';
 import Hls from 'hls.js'
 import { useRoute } from 'vue-router'
 import Player from 'nplayer';
 import Danmaku from '@nplayer/danmaku';
+import axios from 'axios';
 
 export default defineComponent({
   name: 'PlayerPage',
   data() {
     return {
-      episodeId: null
+      episodeId: null,
+      currentSegmentIndex: 0,
+      currentLoadOffset:0
     }
   },
   props: {
@@ -50,6 +53,7 @@ export default defineComponent({
     let player = null;
     let hls = null;
     let renderer = null;
+   // const requestedFragments = new Map(); // Add this line to create a global map
 
     const danmakuItems = ref([]);
 
@@ -115,27 +119,71 @@ export default defineComponent({
 
     const initializeHls = async (hls) => {
       hls.attachMedia(player.video)
-      hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-        hls.loadSource('http://10.0.0.232:1234/stream/output.m3u8')
+
+      hls.on(Hls.Events.MEDIA_ATTACHED, async function () {
+        try {
+          const apiHost = process.env.VUE_APP_API_HOST;
+          const episodeID = route.params.episodeId
+          const response = await axios.post(apiHost+'/api/playlist/'+episodeID);
+          console.log('Playlist API response:', response.data);
+          hls.loadSource('http://10.0.0.232:1234/stream/playlist.m3u8');
+        } catch (error) {
+          console.error('Error calling playlist API:', error);
+        }
       })
+
+      hls.on(Hls.Events.BUFFER_STALLED_ERROR, function () {
+        console.warn('Buffer stalled. Requesting new segments...');
+        const currentTime = player.video.currentTime;
+        console.log(currentTime, currentTime + 30); // 请求接下来30秒的内容
+        hls.recoverMediaError();
+      }); 
+
+      hls.on(Hls.Events.FRAG_LOADING, function (event, data) {
+        console.log('Loading fragment:', data.frag.url);
+        // 记录开始加载的时间
+        data.frag.startLoadTime = performance.now();
+      });
+
+      hls.on(Hls.Events.FRAG_LOADED, function (event, data) {
+        const loadTime = performance.now() - data.frag.startLoadTime;
+        console.log('Loaded fragment:', data.frag.url);
+        console.log('Loading time:', loadTime, 'ms');
+        console.log('Fragment loaded:', data.frag.sn);
+        this.currentSegmentIndex = data.frag.sn;
+        //notifyServerForNextFragments(this.currentSegmentIndex)
+      });
+
 
       hls.on(Hls.Events.ERROR, function (event, data) {
         if (data.fatal) {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
-              // 处理网络错误，包括404 Not Found
-              console.error('网络错误:', data.details);
               if (data.response && data.response.code === 404) {
-                console.log('404_ERROR');
+                //hls.startLoad()
+                // //const currentTime = video.currentTime;
+                // const nextFragmentStart = hls.streamController.nextLoadPosition;
+                // //console.log('404_ERROR', "next fragment start: " + nextFragmentStart);
+                hls.startLoad()
+
+                //hls.stopLoad();
+                // console.log("'404_ERROR'",data.frag.relurl)
+                //notifyServerForNextFragments(hls, data.frag.relurl ,nextFragmentStart)
               }
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
+              hls.recoverMediaError()
               console.error('媒体错误:', data.details);
               break;
             default:
               console.error('未知错误:', data.details);
               break;
           }
+        }
+        console.log("error data:", data)
+        if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR) {
+            const nextFragmentStart = hls.streamController.nextLoadPosition;
+            console.log('404_ERROR', "next fragment start: " + nextFragmentStart);
         }
       });
     }
@@ -158,11 +206,23 @@ export default defineComponent({
 
       player.mount(playerContainer.value);
 
-      hls = new Hls()
+      var config = {
+        maxBufferLength: 30,          // 设置最大缓冲长度为30秒
+        maxMaxBufferLength: 60,       // 设置绝对最大缓冲长度为60秒
+        maxBufferSize: 60 * 1000000,  // 设置最大缓冲大小为60MB
+        maxBufferHole: 0.5,           // 设置最大缓冲空洞为0.5秒
+        highBufferWatchdogPeriod: 2,  // 设置高缓冲监控周期为2秒
+        nudgeMaxRetry: 5,             // 设置最大尝试次数为5
+      };
+      hls = new Hls(config)
 
       // Initialize subtitles after player is mounted
       await initializeSubtitles(subtitleSrc);
-      await initializeHls(hls);
+      var useHls =true;
+
+      if (useHls == true) {
+        await initializeHls(hls);
+      }
 
       document.addEventListener("fullscreenerror", (event) => {
         console.error("全屏错误可能是由于iframe没有全屏权限导致的");

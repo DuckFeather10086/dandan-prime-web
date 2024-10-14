@@ -25,12 +25,11 @@
     <!-- 海报墙 -->
     <div class="anime-section">
       <div class="controls">
-        <h3>Continue Watching</h3>
         <label class="switch">
           <input type="checkbox" v-model="showTitles">
           <span class="slider round"></span>
         </label>
-        <span>{{ showTitles ? 'Title + Poster' : 'Poster Only' }}</span>
+        <span>{{'按照年份排序'}}</span>
       </div>
       <!-- <div class="anime-grid"> -->
         <template v-if="showTitles">
@@ -152,28 +151,6 @@ body {
   width: 100%;
 }
 
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
-.logo {
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  margin: 0 10px;
-}
-
-.user-icon {
-  font-size: 20px;
-}
 
 .featured-banner {
   position: relative;

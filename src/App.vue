@@ -8,17 +8,11 @@
 
 <script>
 
-// import SeasonDetail from './components/SeasonDetail.vue';
-// import MoviePosterWall from './components/MoviePosterWall.vue';
-// import Player from './components/Player.vue';
 import Navbar from './components/naviBar.vue';
 
 export default {
   name: 'App',
   components: {
-    // SeasonDetail,
-    //MoviePosterWall
-    // Player,
     Navbar,
   },  
 }

@@ -1,33 +1,83 @@
 <!-- Navbar.vue -->
 <template>
-    <nav>
-      <ul>
-        <li><router-link to="/">首页</router-link></li>
-        <li><router-link to="/about">关于</router-link></li>
-        <li><router-link to="/contact">联系我们</router-link></li>
+  <nav class="navbar">
+    <div class="left-section">
+      <div class="logo">DanDan Prime</div>
+      <ul class="nav-links">
+        <li><router-link to="/">主页</router-link></li>
       </ul>
-    </nav>
-  </template>
+    </div>
+    <div class="right-section">
+      <a href="https://github.com/your-github-repo" target="_blank" class="icon-link">
+        <font-awesome-icon :icon="['fab', 'github']" />
+      </a>
+      <router-link to="/settings" class="icon-link">
+        <font-awesome-icon icon="cog" />
+      </router-link>
+    </div>
+  </nav>
+</template>
   
-  <style scoped>
-  nav {
-    background-color: #333;
-    padding: 10px;
-  }
-  
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  li {
-    display: inline;
-    margin-right: 20px;
-  }
-  
-  a {
-    color: white;
-    text-decoration: none;
-  }
-  </style>
-  
+  <script>
+export default {
+  name: 'NaviBar'
+}
+</script>
+
+<style scoped>
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.left-section {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  margin-right: 20px;
+  color: rgb(220, 232, 253);
+}
+
+.nav-links {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.nav-links li {
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  display: block;
+  line-height: 24px;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+}
+
+.icon-link {
+  color: white;
+  font-size: 20px;
+  margin-right: 15px;
+  text-decoration: none;
+}
+
+.user-icon {
+  font-size: 20px;
+}
+</style>

@@ -7,9 +7,6 @@
         <h1>{{ seasonData.title }}</h1>
         <div class="season-select">
           <select v-model="selectedSeason" class="custom-select">
-            <!-- <option v-for="n in season.totalSeasons" :key="n" :value="n">
-              Season {{ n }}
-            </option> -->
           </select>
         </div>
         <p class="description">{{ seasonData.summary }}</p>
@@ -18,12 +15,6 @@
           <span class="year">{{ seasonData.air_date }}</span>
           <span class="episodes">{{ seasonData.total_episodes }} episodes</span>
         </div>
-        <!-- <div class="genres">
-          <span v-for="genre in season.genres" :key="genre">{{ genre }}</span>
-        </div> -->
-        <!-- <div class="actions">
-          <button class="play-btn">▶ Episode {{ season.nextEpisode }}</button>
-        </div> -->
       </div>
     </div>
   
@@ -75,7 +66,6 @@
         router.push(`/play/${episodeID}`);
       }
     }
-    // Add any necessary methods here
   }
   </script>
   
