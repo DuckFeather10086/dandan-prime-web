@@ -242,12 +242,14 @@ body {
   max-width: 270px; /* 设置最大宽度，防止在大屏幕上过大 */
   max-height: 480px; /* 设置最大高度 */
   overflow: hidden;
+
 }
 
 .poster img {
   width: 100%;
   height: 100%;
   object-fit: cover; /* 确保图片覆盖整个容器 */
+  border-radius: 10px; /* 添加圆角效果 */
 }
 
 .last-watched-title {

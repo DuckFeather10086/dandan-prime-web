@@ -1,6 +1,6 @@
 <template>
   <div class="season-detail-page">
-    <div class="hero-banner">
+    <div class="hero-banner" v-if="seasonData">
       <img :src="seasonData.image_url" :alt="seasonData.title" class="banner-image">
       <div class="banner-content">
         <h1>{{ seasonData.title }}</h1>
@@ -14,9 +14,11 @@
         </div>
       </div>
     </div>
-
+    <div v-else>
+      <p>Loading...</p> <!-- 添加加载提示 -->
+    </div>
     <!-- 剧集列表 -->
-    <div class="episode-list">
+    <div class="episode-list" v-if="seasonData">
       <h2>Episodes</h2>
       <div v-for="(episodeGroup, dandanplayEpisodeId) in seasonData.episodes" :key="dandanplayEpisodeId" class="episode-group">
         <h3>{{ episodeGroup[0].title }}</h3>
@@ -96,7 +98,7 @@
   
   .banner-content {
     position: absolute;
-    top: 150px;
+    bottom: 80px;
     left: 50px;
     max-width: 60%;
     background: rgba(0, 0, 0, 0.5); /* 添加半透明背景 */

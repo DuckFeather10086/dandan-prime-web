@@ -2,7 +2,7 @@
   <div class="video-player-container">
       <div ref="playerContainer" class="player-container">
         <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
-          <div id="ass-container"  style="position: relative;"></div>
+          <div id="ass-container" style="position: absolute; top: 0; left: 0;"></div>
         </div>
       </div>
   </div>
@@ -211,10 +211,6 @@ export default defineComponent({
       var config = {
         maxBufferLength: 30,
         maxMaxBufferLength: 60,
-        maxBufferSize: 60 * 1000000,
-        maxBufferHole: 0.5,
-        highBufferWatchdogPeriod: 2,
-        nudgeMaxRetry: 5,
       };
       hls = new Hls(config)
 
