@@ -1,6 +1,5 @@
 <template>
   <div class="anime-homepage">
-
     <!-- 大型顶部横幅 -->
     <div class="featured-banner" v-if="lastWatched">
       <div class="banner-background" :style="{ backgroundImage: `url(${lastWatched.imageUrl})` }"></div>
@@ -62,6 +61,9 @@
               <div v-for="anime in filteredAnimeList" :key="anime.title" class="anime-item" @click="navigateToSeasonInfo(anime.id)">
                 <div class="image-container">
                   <img :src="anime.image_url" :alt="anime.title">
+                </div>
+                <div class="anime-info">
+                  <h4>{{ anime.title }}</h4>
                 </div>
               </div>
           </div>
@@ -174,18 +176,6 @@ body {
   width: 100%;
 }
 
-
-.featured-banner {
-  position: relative;
-  height: 60vh;
-  overflow: hidden;
-}
-
-.featured-banner {
-  position: relative;
-  height: 80vh; /* 稍微增加高度以获得更好的视觉效果 */
-  overflow: hidden;
-}
 
 .featured-banner {
   position: relative;
@@ -343,12 +333,10 @@ button {
 }
 
 .year-group h2 {
-  
   margin-bottom: 15px;
   font-size: 1.5em;
   color: #333;
 }
-
 
 .anime-item {
   transition: transform 0.3s ease;
@@ -356,23 +344,6 @@ button {
 
 .anime-item:hover {
   transform: scale(1.05);
-}
-
-.image-container {
-  width: 100%;
-  padding-top: 150%; /* 2:3 aspect ratio */
-  position: relative;
-  overflow: hidden;
-}
-
-.image-container img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 5px;
 }
 
 .anime-info {
@@ -452,7 +423,6 @@ input:checked + .slider:before {
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 
 .info h2 {
   margin-top: 0;
