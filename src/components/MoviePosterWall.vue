@@ -6,16 +6,17 @@
       <div class="banner-background" :style="{ backgroundImage: `url(${lastWatched.imageUrl})` }"></div>
       <div class="banner-content">
         <div class="poster-section">
-          <h3 class="last-watched-title">上次看到</h3>
           <div class="poster">
             <img :src="lastWatched.posterUrl" :alt="lastWatched.anime_title">
           </div>
         </div>
         <div class="info">
-          <h2>{{ lastWatched.anime_title }}</h2>
+          <h2 class="last-watched-title">上次看到</h2>
+          <h3>{{ lastWatched.anime_title }}</h3>
+          <h4>{{ lastWatched.last_watched_episode_title }}</h4>
           <div class="buttons">
-            <button class="play-btn"  @click="navigateToEpisodeInfo(lastWatched.episode_id)">▶ Play</button>
-            <button class="info-btn"  @click="navigateToSeasonInfo(lastWatched.anime_id)">More Info</button>
+            <button class="play-btn" @click="navigateToEpisodeInfo(lastWatched.last_watched_episode_id)">▶ Play</button>
+            <button class="info-btn" @click="navigateToSeasonInfo(lastWatched.last_watched_bangumi_id)">More Info</button>
           </div>
         </div>
       </div>
@@ -141,19 +142,13 @@ export default {
     },
     fetchLastWatched() {
       const apiHost = process.env.VUE_APP_API_HOST;
-      axios.get(apiHost+'/api/bangumi/last_watched')
+      axios.get(apiHost+'/api/last_watched?user_id=1')
         .then(response => {
           this.lastWatched = response.data
         })
         .catch(error => {
           console.error('Error fetching anime:', error)
         })
-
-      this.lastWatched = {
-        anime_title: "負けヒロインが多すぎる",
-        imageUrl: "https://api.bgm.tv/v0/subjects/464376/image?type=large",
-        posterUrl: "https://api.bgm.tv/v0/subjects/464376/image?type=large"
-      }
     },
     navigateToSeasonInfo(animeId) {
       router.push(`/season/${animeId}`);
@@ -214,13 +209,6 @@ body {
   background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.3) 100%);
 }
 
-.banner-content {
-  position: absolute;
-  bottom: 1%;
-  left: 3%;
-  z-index: 2;
-  max-width: 50%;
-}
 
 .banner-content h2 {
   font-size: 3rem;
@@ -228,11 +216,6 @@ body {
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
-.banner-content p {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  color: #00ff00; /* 绿色，类似Prime Video的风格 */
-}
 
 .banner-background {
   position: absolute;
@@ -246,21 +229,38 @@ body {
   transform: scale(1.1); /* 防止模糊边缘 */
 }
 
+
 .banner-content {
   position: relative;
   display: flex;
   align-items: center;
+  bottom: 1%;
+  left: 3%;
   height: 100%;
+  max-width: 60%;
   padding: 20px;
   color: white;
   z-index: 1;
 }
 
+
 .poster-section {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-right: 20px;
+  padding: 10px;
+}
+
+.poster {
+  max-width: 270px; /* 设置最大宽度，防止在大屏幕上过大 */
+  max-height: 480px; /* 设置最大高度 */
+  overflow: hidden;
+}
+
+.poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 确保图片覆盖整个容器 */
 }
 
 .last-watched-title {
@@ -269,24 +269,13 @@ body {
   font-weight: bold;
 }
 
-.poster {
-  flex-shrink: 0;
-  width: 180px;
-  height: 260px;
-  margin-right: 20px;
-  overflow: hidden;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
-
-.poster img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 .info {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
+  background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色 */
+  border-radius: 10px; /* 圆角矩形 */
+  padding: 10px; /* 添加内边距以增加可读性 */
 }
 
 h2 {
@@ -297,7 +286,8 @@ h2 {
 .buttons {
   display: flex;
   gap: 15px;
-  padding-top:75px; 
+  padding-top:0px; 
+  padding-bottom:0px; 
 }
 
 button {
@@ -309,7 +299,7 @@ button {
 }
 
 .play-btn {
-  background-color: #e50914;
+  background-color: #c5aeaf;
   color: white;
 }
 
@@ -454,6 +444,65 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
+.last-watched-container {
+  display: flex;
+  align-items: stretch;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+.info h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.5em;
+  color: #ffffff;
+}
+
+.info h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  color: #ffffff;
+}
+
+.info h4 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.1em;
+  color: #ffffff;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.play-btn, .info-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+
+.play-btn {
+  background-color: #ccc;
+  color: rgb(0, 0, 0);
+}
+
+.info-btn {
+  background-color: #333;
+  color: white;
+}
+
+.play-btn:hover, .info-btn:hover {
+  opacity: 0.9;
+}
+
 
 /* 响应式设计 */
 @media (max-width: 768px) {
@@ -500,7 +549,7 @@ input:checked + .slider:before {
 .search-input {
   margin-left: 15px;
   padding: 5px 10px;
-  border: 1px solid #ccc;
+  border: 1px solid hwb(0 80% 20%);
   border-radius: 4px;
   font-size: 14px;
 }
@@ -519,3 +568,5 @@ input:checked + .slider:before {
   }
 }
 </style>
+
+

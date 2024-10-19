@@ -169,7 +169,29 @@ export default defineComponent({
       });
     }
 
+    const sendLastWatchedData = async () => {
+      try {
+        const episodeId = route.params.episodeId;
+        const response = await fetch('http://10.0.0.232:1234/api/last_watched', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: "1",
+            last_watched_episode_id: episodeId,
+          }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error('Error sending last watched data:', error);
+      }
+    };
+
     onMounted(async () => {
+      await sendLastWatchedData();
       await fetchEpisodeInfo();
       const danmakuArr = toRaw(danmakuItems.value);
       console.log('Player mounted successfully1',danmakuArr);
@@ -198,11 +220,12 @@ export default defineComponent({
 
       // Initialize subtitles after player is mounted
       await initializeSubtitles(subtitleSrc);
-      var useHls =true;
+      var useHls = true;
 
       if (useHls == true) {
         await initializeHls(hls);
       }
+
 
       document.addEventListener("fullscreenerror", (event) => {
         console.error("全屏错误可能是由于iframe没有全屏权限导致的");
