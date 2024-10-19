@@ -174,23 +174,10 @@ body {
   width: 100%;
 }
 
-
-.featured-banner {
-  position: relative;
-  height: 60vh;
-  overflow: hidden;
-}
-
-.featured-banner {
-  position: relative;
-  height: 80vh; /* 稍微增加高度以获得更好的视觉效果 */
-  overflow: hidden;
-}
-
 .featured-banner {
   position: relative;
   width: 100%;
-  height: 500px; /* 减小高度 */
+  height: 50vh; /* 减小高度 */
   overflow: hidden;
 }
 

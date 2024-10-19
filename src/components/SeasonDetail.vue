@@ -2,14 +2,15 @@
   <div class="season-detail-page">
     <div class="hero-banner">
       <img :src="seasonData.image_url" :alt="seasonData.title" class="banner-image">
-      <div class="banner-overlay"></div>
       <div class="banner-content">
         <h1>{{ seasonData.title }}</h1>
         <p class="description">{{ seasonData.summary }}</p>
         <div class="meta-info">
-          <span >★ {{ seasonData.rate_score }}</span>
-          <span >{{ seasonData.air_date }}</span>
-          <span >{{ seasonData.total_episodes }} episodes</span>
+          <div class="meta-info-container">
+            <span>⭐{{ seasonData.rate_score }} </span>
+            <span>{{ seasonData.air_date }} </span>
+            <span>{{ seasonData.total_episodes }} episodes </span>
+          </div>
         </div>
       </div>
     </div>
@@ -74,7 +75,7 @@
   
   .hero-banner {
     position: relative;
-    height: 70vh;
+    height: 60vh;
     overflow: hidden;
   }
   
@@ -95,9 +96,12 @@
   
   .banner-content {
     position: absolute;
-    bottom: 50px;
+    top: 150px;
     left: 50px;
     max-width: 60%;
+    background: rgba(0, 0, 0, 0.5); /* 添加半透明背景 */
+    padding: 10px; /* 添加内边距 */
+    border-radius: 5px; /* 添加圆角 */
   }
   
   .banner-content h1 {
@@ -148,14 +152,47 @@
     color: #0082b0;
   }
 
-  /* 响应式设计调整 */
+  /* 响应式设计调 */
   @media (max-width: 768px) {
+    .hero-banner {
+      height: 40vh; /* 在小屏幕上调整高度 */
+    }
+
+    .banner-content {
+      bottom: 20px; /* 在小屏幕上调整内容位置 */
+      left: 20px; /* 在小屏幕上调整内容位置 */
+      max-width: 80%; /* 在小屏幕上调整最大宽度 */
+      padding: 5px; /* 在小屏幕上调整内边距 */
+    }
+
     .banner-content h1 {
-      font-size: 2rem;
+      font-size: 1.5rem; /* 在小屏幕上调整标题大小 */
     }
 
     .play-btn {
       width: 100%;
     }
+  }
+
+  @media (max-width: 480px) {
+    .hero-banner {
+      height: 90vh;
+    }
+    
+    .banner-content h2 {
+      font-size: 1.5rem;
+    }
+    
+    .banner-content {
+      max-width: 80%;
+    }
+  }
+
+
+  .meta-info-container {
+    display: flex;
+    flex-wrap: wrap; /* 启用换行 */
+    gap: 10px; /* 添加间距 */
+    align-items: center; /* 垂直居中对齐 */
   }
   </style>
