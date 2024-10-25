@@ -242,7 +242,6 @@ body {
   max-width: 270px; /* 设置最大宽度，防止在大屏幕上过大 */
   max-height: 480px; /* 设置最大高度 */
   overflow: hidden;
-
 }
 
 .poster img {

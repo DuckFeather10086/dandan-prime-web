@@ -24,7 +24,7 @@
         <h3>{{ episodeGroup[0].title }}</h3>
         <div class="episode-details">
           <img v-if="episodeGroup[0].thumbnail" :src="episodeGroup[0].thumbnail" :alt="episodeGroup[0].title" class="episode-thumbnail">
-          <p class="episode-introduction">{{ episodeGroup[0].introduction || 'No description available' }}</p>
+          <!-- <p class="episode-introduction">{{ episodeGroup[0].introduction || 'No description available' }}</p> -->
         </div>
         <div v-for="episode in episodeGroup" :key="episode.id" class="episode-item">
           <p class="episode-filename">{{ episode.file_name }}</p>

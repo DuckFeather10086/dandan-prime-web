@@ -194,8 +194,7 @@ export default defineComponent({
       await sendLastWatchedData();
       await fetchEpisodeInfo();
       const danmakuArr = toRaw(danmakuItems.value);
-      console.log('Player mounted successfully1',danmakuArr);
-      console.log('Player mounted successfully2',danmakuItems);
+      console.log('Player mounted successfully1',danmakuArr.length());
 
       const danmaku = new Danmaku({
         items: danmakuItems.value,
@@ -221,7 +220,6 @@ export default defineComponent({
       if (useHls == true) {
         await initializeHls(hls);
       }
-
 
       document.addEventListener("fullscreenerror", (event) => {
         console.error("全屏错误可能是由于iframe没有全屏权限导致的");

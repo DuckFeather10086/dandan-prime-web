@@ -8,7 +8,7 @@
       </ul>
     </div>
     <div class="right-section">
-      <a href="https://github.com/your-github-repo" target="_blank" class="icon-link">
+      <a href="https://github.com/DuckFeather10086/dandan-prime" target="_blank" class="icon-link">
         <font-awesome-icon :icon="['fab', 'github']" />
       </a>
       <router-link to="/settings" class="icon-link">
