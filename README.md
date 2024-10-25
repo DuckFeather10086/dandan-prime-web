@@ -1,4 +1,4 @@
-# dandan-prime
+# dandan-prime-web
 
 ## Project setup
 ```
