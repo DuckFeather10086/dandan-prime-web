@@ -21,7 +21,7 @@
       <div class="setting-item">
         <div class="setting-label">
           <span>HLS 流媒体</span>
-          <span class="setting-description">启用 HLS 自适应码率串流</span>
+          <span class="setting-description">启用 HLS 推流（兼容性更强）</span>
         </div>
         <div class="checkbox-wrapper">
           <input 
@@ -29,6 +29,7 @@
             id="hlsToggle" 
             class="checkbox-input"
             v-model="hlsEnabled"
+            @change="toggleHLS"
           >
           <label for="hlsToggle" class="checkbox-label">
             <span class="status-text">{{ hlsEnabled ? '已启用' : '未启用' }}</span>
@@ -40,6 +41,8 @@
 </template>
 
 <script>
+const API_BASE_URL = process.env.VUE_APP_API_HOST;
+
 export default {
   data() {
     return {
@@ -47,23 +50,65 @@ export default {
       isUpdating: false
     };
   },
+  async created() {
+    // 页面加载时获取HLS状态
+    await this.fetchHLSStatus();
+  },
   methods: {
+    async fetchHLSStatus() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/hls/enabled`);
+        const data = await response.json();
+        this.hlsEnabled = data.hls_enabled;
+      } catch (error) {
+        console.error('获取HLS状态失败:', error);
+        this.$message.error('获取HLS状态失败');
+      }
+    },
+    
     async updateMediaLibrary() {
       this.isUpdating = true;
       try {
-        // 模拟更新过程
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        console.log('媒体库已更新');
+        const response = await fetch(`${API_BASE_URL}/api/bangumi/media_library`, {
+          method: 'POST',
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         this.$message.success('媒体库更新成功');
       } catch (error) {
-        this.$message.error('更新失败，请重试');
+        console.error('更新媒体库失败:', error);
+        this.$message.error('更新媒体库失败，请重试');
       } finally {
         this.isUpdating = false;
       }
     },
+
+    async toggleHLS(event) {
+      const newStatus = event.target.checked;
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/hls_enable?enable=${newStatus}`, {
+          method: 'PUT',
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        this.$message.success(`HLS ${newStatus ? '启用' : '禁用'}成功`);
+      } catch (error) {
+        console.error('切换HLS状态失败:', error);
+        this.$message.error('切换HLS状态失败');
+        // 恢复原来的状态
+        this.hlsEnabled = !newStatus;
+      }
+    }
   },
 };
 </script>
+
 
 <style scoped>
 .settings-wrapper {
