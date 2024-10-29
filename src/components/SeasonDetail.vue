@@ -15,7 +15,7 @@
       </div>
     </div>
     <div v-else>
-      <p>Loading...</p> <!-- 添加加载提示 -->
+      <p>Loading...</p> 
     </div>
     <!-- 剧集列表 -->
     <div class="episode-list" v-if="seasonData">
@@ -32,7 +32,7 @@
         </div>
       </div>
     </div>
-    <div class="filler" v-if="!seasonData"></div> <!-- 添加填充元素 -->
+    <div class="filler" v-if="!seasonData"></div>
   </div>
 </template>
   
