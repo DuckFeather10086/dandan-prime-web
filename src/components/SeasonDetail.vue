@@ -15,7 +15,7 @@
       </div>
     </div>
     <div v-else>
-      <p>Loading...</p> 
+      <p>Loading...</p> <!-- 添加加载提示 -->
     </div>
     <!-- 剧集列表 -->
     <div class="episode-list" v-if="seasonData">
@@ -32,7 +32,6 @@
         </div>
       </div>
     </div>
-    <div class="filler" v-if="!seasonData"></div>
   </div>
 </template>
   
@@ -74,9 +73,6 @@
     background-color: #0f171e;
     color: #fff;
     font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column; /* 使子元素垂直排列 */
-    height: 100vh; /* 设置页面高度为100%视口高度 */
   }
   
   .hero-banner {
@@ -118,10 +114,7 @@
   }
 
   .episode-list {
-    flex-grow: 1; /* 使episode-list填满剩余空间 */
     padding: 50px;
-    display: flex;
-    flex-direction: column; /* 确保内容垂直排列 */
   }
 
   .episode-item {
@@ -203,9 +196,5 @@
     flex-wrap: wrap; /* 启用换行 */
     gap: 10px; /* 添加间距 */
     align-items: center; /* 垂直居中对齐 */
-  }
-
-  .filler {
-    flex-grow: 1; /* 填充元素也占据剩余空间 */
   }
   </style>
