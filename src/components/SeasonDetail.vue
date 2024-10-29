@@ -73,7 +73,11 @@
     background-color: #0f171e;
     color: #fff;
     font-family: Arial, sans-serif;
+    min-height: 100vh; /* 添加这行 */
+    display: flex; /* 添加这行 */
+    flex-direction: column; /* 添加这行 */
   }
+
   
   .hero-banner {
     position: relative;
@@ -115,8 +119,8 @@
 
   .episode-list {
     padding: 50px;
+    flex: 1; /* 添加这行 */
   }
-
   .episode-item {
     display: flex;
     justify-content: space-between;
