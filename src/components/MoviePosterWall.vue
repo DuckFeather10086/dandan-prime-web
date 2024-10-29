@@ -59,13 +59,17 @@
               <p>没有找到匹配的动画</p>
             </div>
             <div class="anime-grid">
-              <div v-for="anime in filteredAnimeList" :key="anime.title" class="anime-item" @click="navigateToSeasonInfo(anime.id)">
+              <div v-for="anime in filteredAnimeList" :key="anime.title" class="anime-item" @click="navigateToSeasonInfo(anime.id)" @contextmenu.prevent="showContextMenu($event, anime.id)">
                 <div class="image-container">
                   <img :src="anime.image_url" :alt="anime.title">
                 </div>
               </div>
           </div>
         </template>
+    </div>
+    <!-- 右键菜单 -->
+    <div v-if="contextMenuVisible" class="context-menu" :style="{ top: contextMenuY + 'px', left: contextMenuX + 'px' }">
+      <button @click="confirmDelete(selectedAnimeId)">删除</button>
     </div>
   </div>
 </template>
@@ -81,12 +85,17 @@ export default {
       showTitles: false,
       animeList: [],
       lastWatched: null,
-      searchQuery: '' 
+      searchQuery: '',
+      contextMenuVisible: false,
+      contextMenuX: 0,
+      contextMenuY: 0,
+      selectedAnimeId: null,
     }
   },
   mounted() {
     this.fetchAnime()
     this.fetchLastWatched()
+    document.addEventListener('click', this.hideContextMenu); // Hide context menu on click outside
 
   },
   computed: {
@@ -131,8 +140,7 @@ export default {
   },
   methods: {
     fetchAnime() {
-      const apiHost = process.env.VUE_APP_API_HOST;
-      axios.get(apiHost+'/api/bangumi/list')
+      axios.get(`${process.env.VUE_APP_API_HOST}/api/bangumi/list`)
         .then(response => {
           this.animeList = response.data
         })
@@ -141,8 +149,7 @@ export default {
         })
     },
     fetchLastWatched() {
-      const apiHost = process.env.VUE_APP_API_HOST;
-      axios.get(apiHost+'/api/last_watched?user_id=1')
+      axios.get(`${process.env.VUE_APP_API_HOST}/api/last_watched?user_id=1`)
         .then(response => {
           this.lastWatched = response.data
         })
@@ -155,6 +162,32 @@ export default {
     },
     navigateToEpisodeInfo(episodeID) {
         router.push(`/play/${episodeID}`);
+    },
+    showContextMenu(event, animeId) {
+      this.selectedAnimeId = animeId;
+      this.contextMenuX = event.clientX;
+      this.contextMenuY = event.clientY;
+      this.contextMenuVisible = true;
+    },
+    confirmDelete(animeId) {
+      const confirmed = confirm("您确定要删除这个动画吗？");
+      if (confirmed) {
+        this.deleteAnime(animeId);
+      }
+    },
+    deleteAnime(animeId) {
+      const apiHost = process.env.VUE_APP_API_HOST;
+      axios.delete(apiHost+`/api/bangumi/${animeId}`, {
+        headers: {
+          'User-Agent': 'sai/dandan-prime'
+        }
+      })
+      .catch(error => {
+        console.error('Error deleting anime:', error);
+      });
+    },
+    hideContextMenu() {
+      this.contextMenuVisible = false;
     }
   }
 }
@@ -554,6 +587,28 @@ input:checked + .slider:before {
     margin-top: 10px;
     width: 100%;
   }
+}
+
+.context-menu {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.context-menu button {
+  display: block;
+  padding: 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.context-menu button:hover {
+  background-color: #f0f0f0;
 }
 </style>
 

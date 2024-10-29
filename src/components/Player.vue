@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, onBeforeUnmount, ref, toRaw} from 'vue';
+import { defineComponent, onMounted, onBeforeUnmount, ref} from 'vue';
 import Hls from 'hls.js'
 import { useRoute } from 'vue-router'
 import Player from 'nplayer';
@@ -52,6 +52,7 @@ export default defineComponent({
     let renderer = null;
 
     const danmakuItems = ref([]);
+
 
     const fetchDanmakuItems = async (episodeId) => {
       try {
@@ -118,7 +119,7 @@ export default defineComponent({
           const episodeID = route.params.episodeId
           const response = await axios.post(apiHost+'/api/playlist/'+episodeID);
           console.log('Playlist API response:', response.data);
-          hls.loadSource(apiHost+'/stream/playlist.m3u8');
+          hls.loadSource(apiHost+'/stream/playlist_1080.m3u8');
         } catch (error) {
           console.error('Error calling playlist API:', error);
         }
@@ -172,8 +173,9 @@ export default defineComponent({
     const sendLastWatchedData = async () => {
       try {
         const episodeId = route.params.episodeId;
-        const response = await fetch('http://10.0.0.232:1234/api/last_watched', {
-          method: 'POST',
+        const apiHost = process.env.VUE_APP_API_HOST;
+        const response = await fetch(apiHost+'/api/last_watched', {
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -190,19 +192,45 @@ export default defineComponent({
       }
     };
 
+    const fetchHlsEnabled = async () => {
+      try {
+        const apiHost = process.env.VUE_APP_API_HOST;
+        const response = await fetch(apiHost+'/api/hls/enabled');
+        const data = await response.json();
+        return data.hls_enabled;
+      } catch (error) {
+        console.error('Failed to fetch HLS enabled status:', error);
+        return false; // Default to false if there's an error
+      }
+    };
+
     onMounted(async () => {
       await sendLastWatchedData();
       await fetchEpisodeInfo();
-      const danmakuArr = toRaw(danmakuItems.value);
-      console.log('Player mounted successfully1',danmakuArr.length());
 
       const danmaku = new Danmaku({
         items: danmakuItems.value,
       });
+      console.log(danmaku)
+
       console.log(videoSrc.value)
       player = new Player({
         src: videoSrc.value,
+        controls: [
+          [
+            "play",
+            "volume",
+            "time",
+            "spacer",
+            "airplay",
+            "settings",
+            "web-fullscreen",
+            "fullscreen"
+          ],
+          ["progress"]
+        ],
         plugins: [danmaku],
+        bpControls: {}
       });
 
       player.mount(playerContainer.value);
@@ -215,7 +243,8 @@ export default defineComponent({
 
       // Initialize subtitles after player is mounted
       await initializeSubtitles(subtitleSrc);
-      var useHls = true;
+
+      const useHls = await fetchHlsEnabled();
 
       if (useHls == true) {
         await initializeHls(hls);

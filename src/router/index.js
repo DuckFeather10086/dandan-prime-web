@@ -5,6 +5,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import MoviePosterWall from '../components/MoviePosterWall.vue'
 import SeasonDetail from '../components/SeasonDetail.vue'
 import Player from '../components/Player.vue'
+import PlaySettings from '../components/PlayerSettings.vue'
 
 const routes = [
   {
@@ -21,6 +22,11 @@ const routes = [
     path: '/season/:animeId(\\d+)',
     name: 'SeasonDetail',
     component: SeasonDetail
+  },
+  {
+    path: '/settings',
+    name: 'PlaySettings',
+    component: PlaySettings
   }
 ]
 
