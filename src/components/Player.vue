@@ -111,7 +111,7 @@ export default defineComponent({
       }
     };
 
-    const initializeHls = async (hls) => {
+    const initializeHls = async (hls, res) => {
       hls.attachMedia(player.video)
       hls.on(Hls.Events.MEDIA_ATTACHED, async function () {
         try {
@@ -119,7 +119,7 @@ export default defineComponent({
           const episodeID = route.params.episodeId
           const response = await axios.post(apiHost+'/api/playlist/'+episodeID);
           console.log('Playlist API response:', response.data);
-          hls.loadSource(apiHost+'/stream/playlist_1080.m3u8');
+          hls.loadSource(apiHost+'/stream/playlist_'+res+'.m3u8');
         } catch (error) {
           console.error('Error calling playlist API:', error);
         }
@@ -213,6 +213,42 @@ export default defineComponent({
       });
       console.log(danmaku)
 
+      const resolutionSettingItem = {
+        html: '清晰度',
+        type: 'select',
+        value: 1080,
+        options: [
+          { value: 480, html: '480P' },
+          { value: 720, html: '720P' },
+          { value: 1080, html: '1080P' },
+        ],
+        init(player) {
+          player.playbackRate = 1;
+        },
+        change(value) {
+          const currentTime = player.video.currentTime;
+          console.log(currentTime)
+          console.log(player)
+          console.log("114514")
+
+          if (hls) {
+              hls.destroy();
+          }
+          var config = {
+            maxBufferLength: 30,
+            maxMaxBufferLength: 60,
+          };
+          hls = new Hls(config)
+
+          initializeHls(hls, value).then(() => {
+            // Pause the player at the saved time after initializeHls is done
+            console.log(currentTime)
+            player.video.currentTime = currentTime;
+            player.video.play();
+          });
+        },
+      }
+
       console.log(videoSrc.value)
       player = new Player({
         src: videoSrc.value,
@@ -230,6 +266,7 @@ export default defineComponent({
           ["progress"]
         ],
         plugins: [danmaku],
+        settings:[resolutionSettingItem,"speed"],
         bpControls: {}
       });
 
@@ -247,7 +284,7 @@ export default defineComponent({
       const useHls = await fetchHlsEnabled();
 
       if (useHls == true) {
-        await initializeHls(hls);
+        await initializeHls(hls,1080);
       }
 
       document.addEventListener("fullscreenerror", (event) => {
