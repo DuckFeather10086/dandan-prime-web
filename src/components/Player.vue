@@ -1,6 +1,6 @@
 <template>
   <div class="video-player-container">
-      <div ref="playerContainer" class="player-container">
+      <div ref="playerContainer" class="player-container" id="player-container">
         <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
           <div id="ass-container" style="position: absolute; top: 0; left: 0;"></div>
         </div>
@@ -99,8 +99,11 @@ export default defineComponent({
           
           const subtitleText = await response.text();
           console.log('Subtitle text:', subtitleText);
-          const ass = new ASS.default(subtitleText, player.video);
+          const ass = new ASS.default(subtitleText, player.video,);
           ass.show();
+
+          console.info(player.video);
+  
 
           player.on('timeupdate', () => {
             renderer.render(player.currentTime);

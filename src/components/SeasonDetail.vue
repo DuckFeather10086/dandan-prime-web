@@ -102,7 +102,8 @@
   
   .banner-content {
     position: absolute;
-    bottom: 80px;
+    top:10px;
+    bottom: 20px;
     left: 50px;
     max-width: 60%;
     background: rgba(0, 0, 0, 0.5); /* 添加半透明背景 */
@@ -182,7 +183,7 @@
 
   @media (max-width: 480px) {
     .hero-banner {
-      height: 90vh;
+      height: 100vh;
     }
     
     .banner-content h2 {
@@ -190,7 +191,11 @@
     }
     
     .banner-content {
-      max-width: 80%;
+      bottom: 20px; /* 在小屏幕上调整内容位置 */
+      left: 20px; /* 在小屏幕上调整内容位置 */
+      max-width: 80%; /* 在小屏幕上调整最大宽度 */
+      max-height: 120%; /* 在小屏幕上调整最大宽度 */
+      padding: 5px; /* 在小屏幕上调整内边距 */
     }
   }
 
