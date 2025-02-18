@@ -7,6 +7,7 @@
         <p class="description">{{ seasonData.summary }}</p>
         <div class="meta-info">
           <div class="meta-info-container">
+            <span>上次看到: 第 {{ lastWatchedEpisode.episode_no }} 集 {{ lastWatchedEpisode.title }}</span>
             <span>⭐{{ seasonData.rate_score }} </span>
             <span>{{ seasonData.air_date }} </span>
             <span>{{ seasonData.total_episodes }} episodes </span>
@@ -43,11 +44,13 @@
     name: 'SeasonDetailPage',
     data() {
       return {
-        seasonData: null
+        seasonData: null,
+        lastWatchedEpisode: null
       }
     },
     created() {                       
       this.fetchSeasonInfo()
+      this.fetchEpisodeInfo()  
     },
     methods: {
       async fetchSeasonInfo() {
@@ -59,6 +62,17 @@
           this.seasonData = response.data
         } catch (error) {
           console.error('Error fetching season info:', error)
+        }
+      },
+      async fetchEpisodeInfo(){
+        const episodeId = this.$route.params.episodeId
+        console.log('Fetching episode info for episode ID:', episodeId)
+        try {
+          const apiHost = process.env.VUE_APP_API_HOST;
+          const response = await axios.get(apiHost+`/api/bangumi/episode/${episodeId}`)
+          this.lastWatchedEpisode = response.data
+        } catch (error) {
+          console.error('Error fetching episode info:', error)
         }
       },
       navigateToEpisodeInfo(episodeID) {

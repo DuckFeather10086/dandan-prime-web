@@ -5,7 +5,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import MoviePosterWall from '../components/MoviePosterWall.vue'
 import SeasonDetail from '../components/SeasonDetail.vue'
 import Player from '../components/Player.vue'
-import DPlayer from '../components/DPlayer.vue'
 import PlaySettings from '../components/PlayerSettings.vue'
 
 const routes = [

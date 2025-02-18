@@ -4,6 +4,11 @@
         <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
           <div id="ass-container" style="position: absolute; top: 0; left: 0;"></div>
         </div>
+        <div v-if="showNextEpisode" class="next-episode-container">
+          <button @click="playNextEpisode" class="next-episode-button">
+            播放下一集
+          </button>
+        </div>
       </div>
   </div>
 </template>
@@ -11,7 +16,7 @@
 <script>
 import { defineComponent, onMounted, onBeforeUnmount, ref} from 'vue';
 import Hls from 'hls.js'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import Player from 'nplayer';
 import Danmaku from '@nplayer/danmaku';
 import axios from 'axios';
@@ -46,13 +51,14 @@ export default defineComponent({
     const subtitleContainer = ref(null);
     const videoSrc = ref('');
     const route  = useRoute()
+    const router = useRouter()
     var subtitleSrc = "";
     let player = null;
     let hls = null;
     let renderer = null;
 
     const danmakuItems = ref([]);
-
+    const showNextEpisode = ref(false);
 
     const fetchDanmakuItems = async (episodeId) => {
       try {
@@ -71,7 +77,8 @@ export default defineComponent({
         const episodeId = route.params.episodeId;
 
         // Fetch episode info
-        const apiHost = process.env.VUE_APP_API_HOST;
+        //const apiHost = process.env.VUE_APP_API_HOST;
+        const apiHost = "http://100.115.247.103:1234"
         const response = await fetch(apiHost+`/api/bangumi/episode/${episodeId}`);
         const data = await response.json();
         
@@ -207,6 +214,26 @@ export default defineComponent({
       }
     };
 
+    const playNextEpisode = async () => {
+      try {
+        const episodeId = route.params.episodeId;
+        const apiHost = process.env.VUE_APP_API_HOST;
+        
+        // 获取下一集信息
+        const response = await fetch(apiHost + `/api/bangumi/next-episode/${episodeId}`);
+        const data = await response.json();
+        
+        if (data.next_episode_id) {
+          // 跳转到下一集
+          router.push(`/watch/${data.next_episode_id}`);
+        } else {
+          console.log('没有下一集了');
+        }
+      } catch (error) {
+        console.error('获取下一集信息失败:', error);
+      }
+    };
+
     onMounted(async () => {
       await sendLastWatchedData();
       await fetchEpisodeInfo();
@@ -252,6 +279,21 @@ export default defineComponent({
         },
       }
 
+      const MyPIP = {
+        html: 'turn off subtitle',
+        init() {
+          this.invisible = !('pictureInPictureEnabled' in document);
+          // 初始化是判断浏览器是否不支持，不支持则隐藏自己
+        },
+        click(player) {
+          if (player.video.readyState < 3) return; // 视频还没加载成功
+          if (document.pictureInPictureElement !== player.video) {
+            player.video.requestPictureInPicture()
+          } else {
+            document.exitPictureInPicture()
+          }
+        }
+      }
       console.log(videoSrc.value)
       player = new Player({
         src: videoSrc.value,
@@ -270,7 +312,9 @@ export default defineComponent({
         ],
         plugins: [danmaku],
         settings:[resolutionSettingItem,"speed"],
-        bpControls: {}
+        bpControls: {},
+        contextMenus: ['loop', 'pip', MyPIP, 'version'],
+        contextMenuToggle: true,
       });
 
       player.mount(playerContainer.value);
@@ -294,6 +338,18 @@ export default defineComponent({
         console.error("全屏错误可能是由于iframe没有全屏权限导致的");
         console.log(event);
       });
+
+      player.on('timeupdate', () => {
+        const duration = player.video.duration;
+        const currentTime = player.video.currentTime;
+        
+        // 当视频播放到倒数30秒时显示下一集按钮
+        if (duration - currentTime <= 30) {
+          showNextEpisode.value = true;
+        } else {
+          showNextEpisode.value = false;
+        }
+      });
     });
 
     onBeforeUnmount(() => {
@@ -307,7 +363,9 @@ export default defineComponent({
       subtitleContainer,
       videoSrc,
       subtitleSrc,
-      danmakuItems
+      danmakuItems,
+      showNextEpisode,
+      playNextEpisode
     };
   }
 });
@@ -331,5 +389,28 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   background-color: #000;
+}
+
+.next-episode-container {
+  position: absolute;
+  right: 40px;
+  bottom: 80px;
+  z-index: 2;
+}
+
+.next-episode-button {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.next-episode-button:hover {
+  background-color: rgba(255, 255, 255, 1);
+  transform: scale(1.05);
 }
 </style>
