@@ -1,20 +1,21 @@
 <template>
   <div class="video-player-container">
-      <div ref="playerContainer" class="player-container" id="player-container">
-        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
-          <div id="ass-container" style="position: absolute; top: 0; left: 0;"></div>
-        </div>
-        <div v-if="showNextEpisode" class="next-episode-container">
-          <button @click="playNextEpisode" class="next-episode-button">
-            播放下一集
-          </button>
-        </div>
+    <div ref="playerContainer" class="player-container" id="player-container">
+      <div
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+        <div id="ass-container" style="position: absolute; top: 0; left: 0;"></div>
       </div>
+      <div v-if="showNextEpisode" class="next-episode-container">
+        <button @click="playNextEpisode" class="next-episode-button">
+          播放下一集
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { defineComponent, onMounted, onBeforeUnmount, ref} from 'vue';
+import { defineComponent, onMounted, onBeforeUnmount, ref } from 'vue';
 import Hls from 'hls.js'
 import { useRoute, useRouter } from 'vue-router'
 import Player from 'nplayer';
@@ -27,7 +28,7 @@ export default defineComponent({
     return {
       episodeId: null,
       currentSegmentIndex: 0,
-      currentLoadOffset:0
+      currentLoadOffset: 0
     }
   },
   props: {
@@ -38,19 +39,19 @@ export default defineComponent({
   created() {
     this.initializePlayer()
   },
-  methods:{
+  methods: {
     initializePlayer() {
       this.episodeId = this.$route.params.episodeId
       console.log('Fetching season info for episode ID:', this.episodeId)
     },
-    async fetchEpisodeInfo(){
+    async fetchEpisodeInfo() {
     }
   },
   setup(props) {
     const playerContainer = ref(null);
     const subtitleContainer = ref(null);
     const videoSrc = ref('');
-    const route  = useRoute()
+    const route = useRoute()
     const router = useRouter()
     var subtitleSrc = "";
     let player = null;
@@ -63,7 +64,7 @@ export default defineComponent({
     const fetchDanmakuItems = async (episodeId) => {
       try {
         const apiHost = process.env.VUE_APP_API_HOST;
-        const response = await fetch(apiHost+`/api/bangumi/danmaku/${episodeId}`);
+        const response = await fetch(apiHost + `/api/bangumi/danmaku/${episodeId}`);
         const data = await response.json();
         danmakuItems.value = data.danmakus;
         console.log('Fetched danmaku items len:', data.danmakus.length);
@@ -77,14 +78,13 @@ export default defineComponent({
         const episodeId = route.params.episodeId;
 
         // Fetch episode info
-        //const apiHost = process.env.VUE_APP_API_HOST;
-        const apiHost = "http://100.115.247.103:1234"
-        const response = await fetch(apiHost+`/api/bangumi/episode/${episodeId}`);
+        const apiHost = process.env.VUE_APP_API_HOST;
+        const response = await fetch(apiHost + `/api/bangumi/episode/${episodeId}`);
         const data = await response.json();
-        
-        videoSrc.value = apiHost+`/videos${data.file_path}/${data.file_name}`;
+
+        videoSrc.value = apiHost + `/videos${data.file_path}/${data.file_name}`;
         if (data.subtitles && data.subtitles.length > 0) {
-          subtitleSrc = apiHost+`/subtitles${data.file_path}/${data.subtitles[0]}`;
+          subtitleSrc = apiHost + `/subtitles${data.file_path}/${data.subtitles[0]}`;
         }
 
         // Fetch danmaku items
@@ -96,21 +96,21 @@ export default defineComponent({
 
     const initializeSubtitles = async (subtitleSrc) => {
       console.log('Initializing subtitles1', props.subtitleSrc);
-      console.log('Initializing subtitles2',subtitleSrc);
+      console.log('Initializing subtitles2', subtitleSrc);
       if (subtitleSrc) {
         try {
           const [ASS, response] = await Promise.all([
             import('assjs'),
             fetch(subtitleSrc)
           ]);
-          
+
           const subtitleText = await response.text();
           console.log('Subtitle text:', subtitleText);
           const ass = new ASS.default(subtitleText, player.video,);
           ass.show();
 
           console.info(player.video);
-  
+
 
           player.on('timeupdate', () => {
             renderer.render(player.currentTime);
@@ -127,9 +127,9 @@ export default defineComponent({
         try {
           const apiHost = process.env.VUE_APP_API_HOST;
           const episodeID = route.params.episodeId
-          const response = await axios.post(apiHost+'/api/playlist/'+episodeID);
+          const response = await axios.post(apiHost + '/api/playlist/' + episodeID);
           console.log('Playlist API response:', response.data);
-          hls.loadSource(apiHost+'/stream/playlist_'+res+'.m3u8');
+          hls.loadSource(apiHost + '/stream/playlist_' + res + '.m3u8');
         } catch (error) {
           console.error('Error calling playlist API:', error);
         }
@@ -140,7 +140,7 @@ export default defineComponent({
         const currentTime = player.video.currentTime;
         console.log(currentTime, currentTime + 30); // 请求接下来30秒的内容
         hls.recoverMediaError();
-      }); 
+      });
 
       hls.on(Hls.Events.FRAG_LOADING, function (event, data) {
         console.log('Loading fragment:', data.frag.url);
@@ -174,8 +174,8 @@ export default defineComponent({
         }
         console.log("error data:", data)
         if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR) {
-            const nextFragmentStart = hls.streamController.nextLoadPosition;
-            console.log('404_ERROR', "next fragment start: " + nextFragmentStart);
+          const nextFragmentStart = hls.streamController.nextLoadPosition;
+          console.log('404_ERROR', "next fragment start: " + nextFragmentStart);
         }
       });
     }
@@ -184,7 +184,7 @@ export default defineComponent({
       try {
         const episodeId = route.params.episodeId;
         const apiHost = process.env.VUE_APP_API_HOST;
-        const response = await fetch(apiHost+'/api/last_watched', {
+        const response = await fetch(apiHost + '/api/last_watched', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -205,7 +205,7 @@ export default defineComponent({
     const fetchHlsEnabled = async () => {
       try {
         const apiHost = process.env.VUE_APP_API_HOST;
-        const response = await fetch(apiHost+'/api/hls/enabled');
+        const response = await fetch(apiHost + '/api/hls/enabled');
         const data = await response.json();
         return data.hls_enabled;
       } catch (error) {
@@ -218,11 +218,11 @@ export default defineComponent({
       try {
         const episodeId = route.params.episodeId;
         const apiHost = process.env.VUE_APP_API_HOST;
-        
+
         // 获取下一集信息
         const response = await fetch(apiHost + `/api/bangumi/next-episode/${episodeId}`);
         const data = await response.json();
-        
+
         if (data.next_episode_id) {
           // 跳转到下一集
           router.push(`/watch/${data.next_episode_id}`);
@@ -262,7 +262,7 @@ export default defineComponent({
           console.log("114514")
 
           if (hls) {
-              hls.destroy();
+            hls.destroy();
           }
           var config = {
             maxBufferLength: 30,
@@ -311,7 +311,7 @@ export default defineComponent({
           ["progress"]
         ],
         plugins: [danmaku],
-        settings:[resolutionSettingItem,"speed"],
+        settings: [resolutionSettingItem, "speed"],
         bpControls: {},
         contextMenus: ['loop', 'pip', MyPIP, 'version'],
         contextMenuToggle: true,
@@ -331,7 +331,7 @@ export default defineComponent({
       const useHls = await fetchHlsEnabled();
 
       if (useHls == true) {
-        await initializeHls(hls,1080);
+        await initializeHls(hls, 1080);
       }
 
       document.addEventListener("fullscreenerror", (event) => {
@@ -342,7 +342,7 @@ export default defineComponent({
       player.on('timeupdate', () => {
         const duration = player.video.duration;
         const currentTime = player.video.currentTime;
-        
+
         // 当视频播放到倒数30秒时显示下一集按钮
         if (duration - currentTime <= 30) {
           showNextEpisode.value = true;
@@ -357,7 +357,7 @@ export default defineComponent({
         renderer.destroy();
       }
     });
-   
+
     return {
       playerContainer,
       subtitleContainer,
@@ -377,7 +377,7 @@ export default defineComponent({
   padding: 3px 3px;
   max-width: 1200px;
   margin: 0 auto;
-  margin-top: 10vh; 
+  margin-top: 10vh;
   background-color: #1e1e1e;
   color: white;
 }

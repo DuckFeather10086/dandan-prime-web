@@ -16,7 +16,8 @@
           <h4>{{ lastWatched.last_watched_episode_title }}</h4>
           <div class="buttons">
             <button class="play-btn" @click="navigateToEpisodeInfo(lastWatched.last_watched_episode_id)">▶ Play</button>
-            <button class="info-btn" @click="navigateToSeasonInfo(lastWatched.last_watched_bangumi_id)">More Info</button>
+            <button class="info-btn" @click="navigateToSeasonInfo(lastWatched.last_watched_bangumi_id)">More
+              Info</button>
           </div>
         </div>
       </div>
@@ -29,46 +30,44 @@
           <input type="checkbox" v-model="showTitles">
           <span class="slider round"></span>
         </label>
-        <span>{{'按照年份排序'}}</span>
-        <input 
-          type="text" 
-          v-model="searchQuery" 
-          placeholder="搜索动画标题" 
-          class="search-input"
-        >
+        <span>{{ '按照年份排序' }}</span>
+        <input type="text" v-model="searchQuery" placeholder="搜索动画标题" class="search-input">
       </div>
-        <template v-if="showTitles">
-          <div v-for="(animeList, year) in groupedAnimeList" :key="year">
-            <h3>{{ year }}</h3>
-              <div class="year-group">
-                <div class="anime-grid">
-                  <div v-for="anime in animeList" :key="anime.title" class="anime-item" @click="navigateToSeasonInfo(anime.id)">
-                    <div class="image-container">
-                      <img :src="anime.image_url" :alt="anime.title">
-                    </div>
-                    <div class="anime-info">
-                      <h4>{{ anime.title }}</h4>
-                    </div>
-                  </div>
-                </div>
-              </div>
-          </div>
-        </template>
-            <template v-else>
-            <div v-if="filteredAnimeList.length === 0">
-              <p>没有找到匹配的动画</p>
-            </div>
+      <template v-if="showTitles">
+        <div v-for="(animeList, year) in groupedAnimeList" :key="year">
+          <h3>{{ year }}</h3>
+          <div class="year-group">
             <div class="anime-grid">
-              <div v-for="anime in filteredAnimeList" :key="anime.title" class="anime-item" @click="navigateToSeasonInfo(anime.id)" @contextmenu.prevent="showContextMenu($event, anime.id)">
+              <div v-for="anime in animeList" :key="anime.title" class="anime-item"
+                @click="navigateToSeasonInfo(anime.id)">
                 <div class="image-container">
                   <img :src="anime.image_url" :alt="anime.title">
                 </div>
+                <div class="anime-info">
+                  <h4>{{ anime.title }}</h4>
+                </div>
               </div>
+            </div>
           </div>
-        </template>
+        </div>
+      </template>
+      <template v-else>
+        <div v-if="filteredAnimeList.length === 0">
+          <p>没有找到匹配的动画</p>
+        </div>
+        <div class="anime-grid">
+          <div v-for="anime in filteredAnimeList" :key="anime.title" class="anime-item"
+            @click="navigateToSeasonInfo(anime.id)" @contextmenu.prevent="showContextMenu($event, anime.id)">
+            <div class="image-container">
+              <img :src="anime.image_url" :alt="anime.title">
+            </div>
+          </div>
+        </div>
+      </template>
     </div>
     <!-- 右键菜单 -->
-    <div v-if="contextMenuVisible" class="context-menu" :style="{ top: contextMenuY + 'px', left: contextMenuX + 'px' }">
+    <div v-if="contextMenuVisible" class="context-menu"
+      :style="{ top: contextMenuY + 'px', left: contextMenuX + 'px' }">
       <button @click="confirmDelete(selectedAnimeId)">删除</button>
     </div>
   </div>
@@ -103,17 +102,17 @@ export default {
       if (!this.searchQuery) {
         return this.animeList;
       }
-      console.log(this.animeList.filter(anime => 
+      console.log(this.animeList.filter(anime =>
         anime.title.toLowerCase().includes(this.searchQuery.toLowerCase())
       ))
-      return this.animeList.filter(anime => 
+      return this.animeList.filter(anime =>
         anime.title.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
     },
     groupedAnimeList() {
       // 使用 filteredAnimeList 替代 this.animeList
       const grouped = this.filteredAnimeList.reduce((acc, anime) => {
-        const year = anime.air_date.slice(0,4) || 'Unknown Year';
+        const year = anime.air_date.slice(0, 4) || 'Unknown Year';
         if (!acc[year]) {
           acc[year] = [];
         }
@@ -134,8 +133,8 @@ export default {
 
       // Sort years in descending order
       return Object.fromEntries(
-          Object.entries(grouped).sort((a, b) => b[0].localeCompare(a[0]))
-        );
+        Object.entries(grouped).sort((a, b) => b[0].localeCompare(a[0]))
+      );
     }
   },
   methods: {
@@ -161,7 +160,7 @@ export default {
       router.push(`/season/${animeId}`);
     },
     navigateToEpisodeInfo(episodeID) {
-        router.push(`/play/${episodeID}`);
+      router.push(`/play/${episodeID}`);
     },
     showContextMenu(event, animeId) {
       this.selectedAnimeId = animeId;
@@ -177,14 +176,14 @@ export default {
     },
     deleteAnime(animeId) {
       const apiHost = process.env.VUE_APP_API_HOST;
-      axios.delete(apiHost+`/api/bangumi/${animeId}`, {
+      axios.delete(apiHost + `/api/bangumi/${animeId}`, {
         headers: {
           'User-Agent': 'sai/dandan-prime'
         }
       })
-      .catch(error => {
-        console.error('Error deleting anime:', error);
-      });
+        .catch(error => {
+          console.error('Error deleting anime:', error);
+        });
     },
     hideContextMenu() {
       this.contextMenuVisible = false;
@@ -210,7 +209,8 @@ body {
 .featured-banner {
   position: relative;
   width: 100%;
-  height: 50vh; /* 减小高度 */
+  height: 50vh;
+  /* 减小高度 */
   overflow: hidden;
 }
 
@@ -226,14 +226,14 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.3) 100%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.3) 100%);
 }
 
 
 .banner-content h2 {
   font-size: 3rem;
   margin-bottom: 0.5rem;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 
@@ -245,8 +245,10 @@ body {
   height: 100%;
   background-size: cover;
   background-position: center;
-  filter: blur(5px); /* 添加毛玻璃效果 */
-  transform: scale(1.1); /* 防止模糊边缘 */
+  filter: blur(5px);
+  /* 添加毛玻璃效果 */
+  transform: scale(1.1);
+  /* 防止模糊边缘 */
 }
 
 
@@ -272,21 +274,26 @@ body {
 }
 
 .poster {
-  max-width: 270px; /* 设置最大宽度，防止在大屏幕上过大 */
-  max-height: 480px; /* 设置最大高度 */
+  max-width: 270px;
+  /* 设置最大宽度，防止在大屏幕上过大 */
+  max-height: 480px;
+  /* 设置最大高度 */
   overflow: hidden;
 }
 
 .poster img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* 确保图片覆盖整个容器 */
-  border-radius: 10px; /* 添加圆角效果 */
+  object-fit: cover;
+  /* 确保图片覆盖整个容器 */
+  border-radius: 10px;
+  /* 添加圆角效果 */
 }
 
 .last-watched-title {
   margin-bottom: 10px;
-  font-size: 28px; /* 增加字体大小 */
+  font-size: 28px;
+  /* 增加字体大小 */
   font-weight: bold;
 }
 
@@ -294,9 +301,12 @@ body {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色 */
-  border-radius: 10px; /* 圆角矩形 */
-  padding: 10px; /* 添加内边距以增加可读性 */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* 半透明黑色 */
+  border-radius: 10px;
+  /* 圆角矩形 */
+  padding: 10px;
+  /* 添加内边距以增加可读性 */
 }
 
 h2 {
@@ -307,8 +317,8 @@ h2 {
 .buttons {
   display: flex;
   gap: 15px;
-  padding-top:0px; 
-  padding-bottom:0px; 
+  padding-top: 0px;
+  padding-bottom: 0px;
 }
 
 button {
@@ -329,7 +339,8 @@ button {
   color: white;
 }
 
-.play-btn, .info-btn {
+.play-btn,
+.info-btn {
   padding: 10px 20px;
   margin-right: 10px;
   border: none;
@@ -364,7 +375,7 @@ button {
 }
 
 .year-group h2 {
-  
+
   margin-bottom: 15px;
   font-size: 1.5em;
   color: #333;
@@ -381,7 +392,8 @@ button {
 
 .image-container {
   width: 100%;
-  padding-top: 150%; /* 2:3 aspect ratio */
+  padding-top: 150%;
+  /* 2:3 aspect ratio */
   position: relative;
   overflow: hidden;
 }
@@ -410,7 +422,8 @@ button {
   display: flex;
   align-items: center;
   margin-bottom: 15px;
-  flex-wrap: wrap; /* 允许在小屏幕上换行 */
+  flex-wrap: wrap;
+  /* 允许在小屏幕上换行 */
 }
 
 .switch {
@@ -449,11 +462,11 @@ button {
   transition: .4s;
 }
 
-input:checked + .slider {
+input:checked+.slider {
   background-color: #2196F3;
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
   transform: translateX(26px);
 }
 
@@ -501,7 +514,8 @@ input:checked + .slider:before {
   gap: 10px;
 }
 
-.play-btn, .info-btn {
+.play-btn,
+.info-btn {
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
@@ -520,7 +534,8 @@ input:checked + .slider:before {
   color: white;
 }
 
-.play-btn:hover, .info-btn:hover {
+.play-btn:hover,
+.info-btn:hover {
   opacity: 0.9;
 }
 
@@ -543,11 +558,11 @@ input:checked + .slider:before {
   .featured-banner {
     height: 60vh;
   }
-  
+
   .banner-content h2 {
     font-size: 2rem;
   }
-  
+
   .banner-content p {
     font-size: 1rem;
   }
@@ -557,11 +572,11 @@ input:checked + .slider:before {
   .featured-banner {
     height: 50vh;
   }
-  
+
   .banner-content h2 {
     font-size: 1.5rem;
   }
-  
+
   .banner-content {
     max-width: 80%;
   }
@@ -581,7 +596,7 @@ input:checked + .slider:before {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .search-input {
     margin-left: 0;
     margin-top: 10px;
@@ -611,5 +626,3 @@ input:checked + .slider:before {
   background-color: #f0f0f0;
 }
 </style>
-
-

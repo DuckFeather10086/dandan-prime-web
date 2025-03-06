@@ -2,16 +2,13 @@
   <div class="settings-wrapper">
     <div class="settings-card">
       <h2 class="settings-title">系统设置</h2>
-      
+
       <div class="setting-item">
         <div class="setting-label">
           <span>媒体库更新</span>
           <span class="setting-description">更新您的媒体文件索引</span>
         </div>
-        <button 
-          class="update-btn"
-          :class="{ 'loading': isUpdating }"
-          @click="updateMediaLibrary">
+        <button class="update-btn" :class="{ 'loading': isUpdating }" @click="updateMediaLibrary">
           {{ isUpdating ? '更新中...' : '更新媒体库' }}
         </button>
       </div>
@@ -24,13 +21,7 @@
           <span class="setting-description">启用 HLS 推流（兼容性更强）</span>
         </div>
         <div class="checkbox-wrapper">
-          <input 
-            type="checkbox" 
-            id="hlsToggle" 
-            class="checkbox-input"
-            v-model="hlsEnabled"
-            @change="toggleHLS"
-          >
+          <input type="checkbox" id="hlsToggle" class="checkbox-input" v-model="hlsEnabled" @change="toggleHLS">
           <label for="hlsToggle" class="checkbox-label">
             <span class="status-text">{{ hlsEnabled ? '已启用' : '未启用' }}</span>
           </label>
@@ -65,18 +56,18 @@ export default {
         this.$message.error('获取HLS状态失败');
       }
     },
-    
+
     async updateMediaLibrary() {
       this.isUpdating = true;
       try {
-        const response = await fetch(`${API_BASE_URL}/api/bangumi/media_library`, {
+        const response = await fetch(`${API_BASE_URL}/api/bangumi/media-library`, {
           method: 'POST',
         });
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         this.$message.success('媒体库更新成功');
       } catch (error) {
         console.error('更新媒体库失败:', error);
@@ -92,11 +83,11 @@ export default {
         const response = await fetch(`${API_BASE_URL}/api/hls_enable?enable=${newStatus}`, {
           method: 'PUT',
         });
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         this.$message.success(`HLS ${newStatus ? '启用' : '禁用'}成功`);
       } catch (error) {
         console.error('切换HLS状态失败:', error);
@@ -216,7 +207,7 @@ export default {
   user-select: none;
 }
 
-.checkbox-input:checked + .checkbox-label {
+.checkbox-input:checked+.checkbox-label {
   background-color: #4a90e2;
 }
 
@@ -224,7 +215,7 @@ export default {
   background-color: #4a4a4a;
 }
 
-.checkbox-input:checked + .checkbox-label:hover {
+.checkbox-input:checked+.checkbox-label:hover {
   background-color: #357abd;
 }
 
@@ -234,13 +225,13 @@ export default {
     width: 90%;
     padding: 20px;
   }
-  
+
   .setting-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 15px;
   }
-  
+
   .update-btn,
   .checkbox-wrapper {
     align-self: flex-start;
