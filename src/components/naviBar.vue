@@ -77,7 +77,5 @@ export default {
   text-decoration: none;
 }
 
-.user-icon {
-  font-size: 20px;
-}
+/* 删除未使用的 .user-icon 类 */
 </style>

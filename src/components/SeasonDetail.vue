@@ -81,13 +81,9 @@ export default {
   color: #fff;
   font-family: Arial, sans-serif;
   min-height: 100vh;
-  /* 添加这行 */
   display: flex;
-  /* 添加这行 */
   flex-direction: column;
-  /* 添加这行 */
 }
-
 
 .hero-banner {
   position: relative;
@@ -101,14 +97,7 @@ export default {
   object-fit: cover;
 }
 
-.banner-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(to top, rgba(15, 23, 30, 1) 0%, rgba(15, 23, 30, 0.7) 60%, rgba(15, 23, 30, 0.3) 100%);
-}
+/* 删除未使用的 .banner-overlay 类 */
 
 .banner-content {
   position: absolute;
@@ -117,11 +106,8 @@ export default {
   left: 50px;
   max-width: 60%;
   background: rgba(0, 0, 0, 0.5);
-  /* 添加半透明背景 */
   padding: 10px;
-  /* 添加内边距 */
   border-radius: 5px;
-  /* 添加圆角 */
 }
 
 .banner-content h1 {
@@ -134,7 +120,6 @@ export default {
 .episode-list {
   padding: 50px;
   flex: 1;
-  /* 添加这行 */
 }
 
 .episode-item {
@@ -174,27 +159,21 @@ export default {
   color: #0082b0;
 }
 
-/* 响应式设计调 */
+/* 响应式设计 */
 @media (max-width: 768px) {
   .hero-banner {
     height: 40vh;
-    /* 在小屏幕上调整高度 */
   }
 
   .banner-content {
     bottom: 20px;
-    /* 在小屏幕上调整内容位置 */
     left: 20px;
-    /* 在小屏幕上调整内容位置 */
     max-width: 80%;
-    /* 在小屏幕上调整最大宽度 */
     padding: 5px;
-    /* 在小屏幕上调整内边距 */
   }
 
   .banner-content h1 {
     font-size: 1.5rem;
-    /* 在小屏幕上调整标题大小 */
   }
 
   .play-btn {
@@ -207,32 +186,22 @@ export default {
     height: 100vh;
   }
 
-  .banner-content h2 {
-    font-size: 1.5rem;
-  }
+  /* 删除未使用的 .banner-content h2 类 */
 
   .banner-content {
     bottom: 20px;
-    /* 在小屏幕上调整内容位置 */
     left: 20px;
-    /* 在小屏幕上调整内容位置 */
     max-width: 80%;
-    /* 在小屏幕上调整最大宽度 */
     max-height: 120%;
-    /* 在小屏幕上调整最大宽度 */
     padding: 5px;
-    /* 在小屏幕上调整内边距 */
   }
 }
-
 
 .meta-info-container {
   display: flex;
   flex-wrap: wrap;
-  /* 启用换行 */
   gap: 10px;
-  /* 添加间距 */
   align-items: center;
-  /* 垂直居中对齐 */
 }
+
 </style>
